@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "969030654104",
+    "firebase_url": "https://datingapp-development-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "datingapp-development",
+    "storage_bucket": "datingapp-development.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:969030654104:android:0c679957e45ae79635d8ed",
+        "android_client_info": {
+          "package_name": "de.articlexpressug.datingapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "969030654104-0ke6vl19spibp6efdihaa34g8vot30mb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "de.articlexpressug.datingapp",
+            "certificate_hash": "9bf9a22b4dc5a474d88bc3876647a91122d763be"
+          }
+        },
+        {
+          "client_id": "969030654104-qnpjaolesgk5pjlb16rqvqrisaotd5g8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "de.articlexpressug.datingapp",
+            "certificate_hash": "c04bb8ee4891c726f153ca8501cf00aa38d82a2b"
+          }
+        },
+        {
+          "client_id": "969030654104-73makvovergj2pq5mlnmmndi1qdcsvsf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_FpCowLOssw89WfTLrGdqqBPDey7t_dQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "969030654104-73makvovergj2pq5mlnmmndi1qdcsvsf.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "969030654104-41r3or7suc7ttlp0ppumtflmdh26bas4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "de.articlexpressug.datingapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
