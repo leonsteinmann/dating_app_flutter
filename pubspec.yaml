@@ -3,7 +3,7 @@ description: A new approach to dating
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -35,7 +35,6 @@ dependencies:
   #Design
   google_fonts: ^6.2.1
 
-
   #Tools/Utils
   geolocator: ^13.0.2
   workmanager: ^0.5.2
@@ -46,7 +45,7 @@ dependencies:
   rive: ^0.13.20
 
   geoserviceplugin:
-    path: /Users/private/Projects/geoserviceplugin-flutter
+    path: ../geoserviceplugin_flutter
 
   logger: ^2.5.0
   provider: ^6.0.2
@@ -58,14 +57,13 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_localizations: # Add this line
-    sdk: flutter         # Add this line
+    sdk: flutter # Add this line
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
 
 dev_dependencies:
-
   flutter_test:
     sdk: flutter
 
@@ -74,7 +72,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.q
@@ -82,16 +79,16 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-   - assets/icons/logo_300.png
-   - assets/icons/pin.svg
-   - assets/icons/pin.png
-   - assets/icons/logo.svg
-   - assets/icons/google_logo_white.png
-   - assets/icons/apple_logo_black.png
-   - assets/icons/apple_logo_white.png
-   - assets/icons/logo_animation.riv
-   - assets/images/default_profile_picture.png
-   - assets/images/leon.jpg
+    - assets/icons/logo_300.png
+    - assets/icons/pin.svg
+    - assets/icons/pin.png
+    - assets/icons/logo.svg
+    - assets/icons/google_logo_white.png
+    - assets/icons/apple_logo_black.png
+    - assets/icons/apple_logo_white.png
+    - assets/icons/logo_animation.riv
+    - assets/images/default_profile_picture.png
+    - assets/images/leon.jpg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 

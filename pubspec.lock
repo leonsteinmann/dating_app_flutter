@@ -464,7 +464,7 @@ packages:
   geoserviceplugin:
     dependency: "direct main"
     description:
-      path: "/Users/private/Projects/geoserviceplugin-flutter"
+      path: "/Users/leonsteinmann/Projects/geoserviceplugin_flutter"
       relative: false
     source: path
     version: "0.0.1"
