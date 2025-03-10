@@ -1,14 +1,17 @@
-import 'package:datingapp/models/user.dart';
-import 'package:datingapp/services/database.dart';
-import 'package:datingapp/values/colors.dart';
+import 'package:dating_app_flutter/models/user.dart';
+import 'package:dating_app_flutter/services/database.dart';
+import 'package:dating_app_flutter/values/colors.dart';
 import 'package:flutter/material.dart';
 
 class UserProfileImageFutureBuilder extends StatefulWidget {
   final size;
   final uid;
   final profilePictureId;
-  UserProfileImageFutureBuilder(this.uid,
-      {this.size = 30.0, this.profilePictureId});
+  UserProfileImageFutureBuilder(
+    this.uid, {
+    this.size = 30.0,
+    this.profilePictureId,
+  });
 
   @override
   State createState() {
@@ -19,7 +22,10 @@ class UserProfileImageFutureBuilder extends StatefulWidget {
 class _UserProfileImageFutureBuilderState
     extends State<UserProfileImageFutureBuilder> {
   _UserProfileImageFutureBuilderState(
-      this.uid, this.size, this._profilePictureId);
+    this.uid,
+    this.size,
+    this._profilePictureId,
+  );
 
   final uid;
   final double size;
@@ -29,8 +35,10 @@ class _UserProfileImageFutureBuilderState
   @override
   void initState() {
     super.initState();
-    _futureImage =
-        Database.getProfileImage(uid, profilePictureId: _profilePictureId);
+    _futureImage = Database.getProfileImage(
+      uid,
+      profilePictureId: _profilePictureId,
+    );
     //print("IMAGEBUILDER INIT CALLED");
   }
 
@@ -45,10 +53,7 @@ class _UserProfileImageFutureBuilderState
             backgroundImage: (snapshot.data)!.image,
           );
         } else {
-          return CircleAvatar(
-            radius: size,
-            backgroundColor: middleGray,
-          );
+          return CircleAvatar(radius: size, backgroundColor: middleGray);
         }
       },
     );
@@ -87,9 +92,10 @@ class _UserProfileNameFutureBuilderState
         if (snapshot.hasData) {
           return Text(
             snapshot.data!.username!,
-            style: (_textStyle != null)
-                ? _textStyle
-                : Theme.of(context).textTheme.headlineLarge,
+            style:
+                (_textStyle != null)
+                    ? _textStyle
+                    : Theme.of(context).textTheme.headlineLarge,
           );
         } else {
           return Container(

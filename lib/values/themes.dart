@@ -1,5 +1,5 @@
-import 'package:datingapp/services/storageManager.dart';
-import 'package:datingapp/values/colors.dart';
+import 'package:dating_app_flutter/services/storageManager.dart';
+import 'package:dating_app_flutter/values/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -53,24 +53,23 @@ class ThemeNotifier with ChangeNotifier {
     hintColor: mainRed,
     scaffoldBackgroundColor: backgroundLightScheme,
     floatingActionButtonTheme: FloatingActionButtonThemeData(
-        foregroundColor: mainRed, hoverColor: mainRedDark),
+      foregroundColor: mainRed,
+      hoverColor: mainRedDark,
+    ),
     cardColor: cardColorLightScheme,
     dividerColor: mainTextLightScheme,
     shadowColor: Color(0xffbbbbbb),
     focusColor: mainRed,
-    iconTheme: IconThemeData(
-      color: darkIconColor,
-    ),
+    iconTheme: IconThemeData(color: darkIconColor),
     appBarTheme: AppBarTheme(
-        color: Colors.white,
-        iconTheme: IconThemeData(
-          color: mainRed,
-        ),
-        titleTextStyle: GoogleFonts.roboto(
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-          color: mainRed,
-        )),
+      color: Colors.white,
+      iconTheme: IconThemeData(color: mainRed),
+      titleTextStyle: GoogleFonts.roboto(
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
+        color: mainRed,
+      ),
+    ),
     textTheme: TextTheme(
       //
       headlineMedium: GoogleFonts.roboto(
@@ -108,19 +107,16 @@ class ThemeNotifier with ChangeNotifier {
     dividerColor: mainTextLightScheme,
     shadowColor: darkGray,
     focusColor: mainRed,
-    iconTheme: IconThemeData(
-      color: lightIconColor,
-    ),
+    iconTheme: IconThemeData(color: lightIconColor),
     appBarTheme: AppBarTheme(
-        color: Colors.black,
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
-        titleTextStyle: GoogleFonts.roboto(
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-          color: mainTextDarkScheme,
-        )),
+      color: Colors.black,
+      iconTheme: IconThemeData(color: Colors.white),
+      titleTextStyle: GoogleFonts.roboto(
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
+        color: mainTextDarkScheme,
+      ),
+    ),
     textTheme: TextTheme(
       headlineMedium: GoogleFonts.roboto(
         fontSize: 20,

@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:datingapp/main.dart';
-import 'package:datingapp/values/colors.dart';
-import 'package:datingapp/values/dimensions.dart';
-import 'package:datingapp/widgets/animations/flying_location_pin.dart';
-import 'package:datingapp/widgets/animations/logo_animation.dart';
-import 'package:datingapp/widgets/provider.dart';
+import 'package:dating_app_flutter/main.dart';
+import 'package:dating_app_flutter/values/colors.dart';
+import 'package:dating_app_flutter/values/dimensions.dart';
+import 'package:dating_app_flutter/widgets/animations/flying_location_pin.dart';
+import 'package:dating_app_flutter/widgets/animations/logo_animation.dart';
+import 'package:dating_app_flutter/widgets/provider.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -86,11 +86,15 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       var geo = GeoHasher();
       final Map<String, dynamic> locationMap = Map.from(location);
       String centerHash = geo.encode(
-          locationMap["longitude"], locationMap["latitude"],
-          precision: precision);
+        locationMap["longitude"],
+        locationMap["latitude"],
+        precision: precision,
+      );
       final Map<String, String> hashes = geo.neighbors(centerHash);
-      final HashPosition hashPos =
-          HashPosition(hashes: hashes.values.toList(), centerHash: centerHash);
+      final HashPosition hashPos = HashPosition(
+        hashes: hashes.values.toList(),
+        centerHash: centerHash,
+      );
       //Send to RTDB
       if (_loggedIn) {
         onPositionUpdated(hashPos);
@@ -105,8 +109,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   }
 
   void onPositionUpdated(HashPosition hashPos) {
-    final locationMode =
-        Provider.of<LocationModeSelector>(context, listen: false);
+    final locationMode = Provider.of<LocationModeSelector>(
+      context,
+      listen: false,
+    );
 
     // if user moved to a new cell
     if (hashPos.centerHash != locationMode.prevHash) {
@@ -128,23 +134,23 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   Future<void> matchUser(String centerHash) async {
     print("Is matching User with CloudFunction");
-    final matchUserRequest =
-        FirebaseFunctions.instanceFor(region: "europe-west3")
-            .httpsCallable('matchUser');
+    final matchUserRequest = FirebaseFunctions.instanceFor(
+      region: "europe-west3",
+    ).httpsCallable('matchUser');
     final message = {
       'centerHash': centerHash,
       'longitude': location!.geo.decode(centerHash)[0],
       'latitude': location!.geo.decode(centerHash)[1],
     };
 
-    await matchUserRequest(message).then((result) => {
-          print(result),
-        });
+    await matchUserRequest(message).then((result) => {print(result)});
   }
 
   void removePrevHash() {
-    final locationMode =
-        Provider.of<LocationModeSelector>(context, listen: false);
+    final locationMode = Provider.of<LocationModeSelector>(
+      context,
+      listen: false,
+    );
     if (locationMode.prevHash == "") {
       return;
     }
@@ -170,8 +176,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   }
 
   void switchCellListener() {
-    final locationMode =
-        Provider.of<LocationModeSelector>(context, listen: false);
+    final locationMode = Provider.of<LocationModeSelector>(
+      context,
+      listen: false,
+    );
     if (hashCellListener != null) {
       hashCellListener!.cancel();
       hashCellListener = null;
@@ -185,27 +193,34 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         .child(locationMode.prevHash)
         .onChildAdded
         .listen((DatabaseEvent? event) {
-      log.d("event triggered");
-      if (event != null) {
-        if (event.snapshot.key != FirebaseAuth.instance.currentUser!.uid) {
-          encounteredUIDs.add(event.snapshot.key!);
-          _showMatchingNotification(event.snapshot.key!);
-        }
-      }
-    });
+          log.d("event triggered");
+          if (event != null) {
+            if (event.snapshot.key != FirebaseAuth.instance.currentUser!.uid) {
+              encounteredUIDs.add(event.snapshot.key!);
+              _showMatchingNotification(event.snapshot.key!);
+            }
+          }
+        });
   }
 
   void _showMatchingNotification(String matchedName) async {
     const AndroidNotificationDetails and = AndroidNotificationDetails(
-        'flutter_datingapp_channel', "Datingapp matching notifications",
-        importance: Importance.defaultImportance,
-        priority: Priority.defaultPriority);
+      'flutter_datingapp_channel',
+      "Datingapp matching notifications",
+      importance: Importance.defaultImportance,
+      priority: Priority.defaultPriority,
+    );
 
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: and);
-    await flutterLocalNotificationsPlugin.show(0, 'Neuer Match',
-        'Du hast ' + matchedName + ' getroffen', platformChannelSpecifics,
-        payload: 'item x');
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: and,
+    );
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      'Neuer Match',
+      'Du hast ' + matchedName + ' getroffen',
+      platformChannelSpecifics,
+      payload: 'item x',
+    );
   }
 
   // void _clearRTDB() async {
@@ -223,8 +238,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   void _pickStoryImage() async {
     //TODO when picking profile picture, textfield is cleared
-    final file = await ImagePicker()
-        .pickImage(source: ImageSource.camera, imageQuality: 100);
+    final file = await ImagePicker().pickImage(
+      source: ImageSource.camera,
+      imageQuality: 100,
+    );
     if (file != null) {
       final croppedFile = await ImageCropper().cropImage(
         maxHeight: 500,
@@ -257,9 +274,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
           .ref()
           .child("users/${currFBUser.uid}/story/$storyImageId")
           .putFile(_storyImageFile!)
-          .then((result) => {
-                print(result),
-              });
+          .then((result) => {print(result)});
     }
     _getStoryImages();
   }
@@ -316,10 +331,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    Workmanager().initialize(
-      callbackDispatcher,
-      isInDebugMode: true,
-    );
+    Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
 
     Workmanager().registerPeriodicTask(
       "1",
@@ -335,8 +347,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     location?.checkPermission();
     registerNotification();
     //Subscribe to auth changes
-    authStateListener =
-        FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    authStateListener = FirebaseAuth.instance.authStateChanges().listen((
+      User? user,
+    ) {
       if (user == null) {
         setState(() {
           _loggedIn = false;
@@ -349,36 +362,57 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       }
     });
 
-    final locationMode =
-        Provider.of<LocationModeSelector>(context, listen: false);
+    final locationMode = Provider.of<LocationModeSelector>(
+      context,
+      listen: false,
+    );
     if (locationMode.isLocationModeOn) {
       _addLocationStreamListener();
     }
 
-    var initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettingsAndroid = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     var initializationSettingsIOs = DarwinInitializationSettings();
     var initSetttings = InitializationSettings(
-        android: initializationSettingsAndroid, iOS: initializationSettingsIOs);
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOs,
+    );
 
     flutterLocalNotificationsPlugin.initialize(initSetttings);
 
-    final themeSelector =
-        Provider.of<LocationModeSelector>(context, listen: false);
+    final themeSelector = Provider.of<LocationModeSelector>(
+      context,
+      listen: false,
+    );
     _pinController1 = AnimationController(
-        duration: const Duration(milliseconds: 2000), vsync: this);
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
     _pinController2 = AnimationController(
-        duration: const Duration(milliseconds: 3000), vsync: this);
+      duration: const Duration(milliseconds: 3000),
+      vsync: this,
+    );
     _pinController3 = AnimationController(
-        duration: const Duration(milliseconds: 5000), vsync: this);
+      duration: const Duration(milliseconds: 5000),
+      vsync: this,
+    );
     _pinController4 = AnimationController(
-        duration: const Duration(milliseconds: 4000), vsync: this);
+      duration: const Duration(milliseconds: 4000),
+      vsync: this,
+    );
     _pinController5 = AnimationController(
-        duration: const Duration(milliseconds: 7500), vsync: this);
+      duration: const Duration(milliseconds: 7500),
+      vsync: this,
+    );
     _pinController6 = AnimationController(
-        duration: const Duration(milliseconds: 4500), vsync: this);
+      duration: const Duration(milliseconds: 4500),
+      vsync: this,
+    );
     _pinController7 = AnimationController(
-        duration: const Duration(milliseconds: 3300), vsync: this);
+      duration: const Duration(milliseconds: 3300),
+      vsync: this,
+    );
 
     if (themeSelector.isLocationModeOn) {
       startLocationPins();
@@ -402,65 +436,63 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final locationMode =
-        Provider.of<LocationModeSelector>(context, listen: true);
+    final locationMode = Provider.of<LocationModeSelector>(
+      context,
+      listen: true,
+    );
     return Scaffold(
-        body: Stack(
-      alignment: Alignment.bottomCenter,
-      children: [
-        Pins(
+      body: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          Pins(
             pinController1: _pinController1,
             pinController2: _pinController2,
             pinController3: _pinController3,
             pinController4: _pinController4,
             pinController5: _pinController5,
             pinController6: _pinController6,
-            pinController7: _pinController7),
-        Padding(
-          padding: EdgeInsets.all(standardPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              SizedBox(
-                height: standardPadding,
-              ),
-              Row(
-                children: [
-                  Text(
-                    "Meine Story ($countStoryImages/5)",
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: standardPadding,
-              ),
-              buildStorySection(context),
-              SizedBox(
-                height: standardPadding,
-              ),
-              Row(
-                children: [
-                  Text(
-                    "Standort Matching",
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: standardPadding,
-              ),
-              buildMatchingButton(locationMode, context),
-            ],
+            pinController7: _pinController7,
           ),
-        ),
-      ],
-    ));
+          Padding(
+            padding: EdgeInsets.all(standardPadding),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                SizedBox(height: standardPadding),
+                Row(
+                  children: [
+                    Text(
+                      "Meine Story ($countStoryImages/5)",
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                  ],
+                ),
+                SizedBox(height: standardPadding),
+                buildStorySection(context),
+                SizedBox(height: standardPadding),
+                Row(
+                  children: [
+                    Text(
+                      "Standort Matching",
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                  ],
+                ),
+                SizedBox(height: standardPadding),
+                buildMatchingButton(locationMode, context),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Expanded buildMatchingButton(
-      LocationModeSelector locationMode, BuildContext context) {
+    LocationModeSelector locationMode,
+    BuildContext context,
+  ) {
     return Expanded(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -487,15 +519,16 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               HapticFeedback.mediumImpact();
             },
             child: AnimatedContainer(
-                width: 180,
-                height: 180,
-                decoration: BoxDecoration(
-                  boxShadow: (locationMode.isLocationModeOn)
-                      ? [
+              width: 180,
+              height: 180,
+              decoration: BoxDecoration(
+                boxShadow:
+                    (locationMode.isLocationModeOn)
+                        ? [
                           BoxShadow(
-                            color: Theme.of(context)
-                                .scaffoldBackgroundColor
-                                .withOpacity(0.1),
+                            color: Theme.of(
+                              context,
+                            ).scaffoldBackgroundColor.withOpacity(0.1),
                             offset: Offset(0, 0),
                             blurRadius: 1,
                           ),
@@ -505,11 +538,11 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                             blurRadius: 1,
                           ),
                         ]
-                      : [
+                        : [
                           BoxShadow(
-                            color: Theme.of(context)
-                                .scaffoldBackgroundColor
-                                .withOpacity(0.1),
+                            color: Theme.of(
+                              context,
+                            ).scaffoldBackgroundColor.withOpacity(0.1),
                             offset: Offset(-6.0, -6.0),
                             blurRadius: 3.0,
                           ),
@@ -519,34 +552,33 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                             blurRadius: 16.0,
                           ),
                         ],
-                  color: Theme.of(context).cardColor,
-                  borderRadius: BorderRadius.circular(standardCornerRadius),
-                ),
-                duration: Duration(milliseconds: 200),
-                child: (locationMode.isLocationModeOn)
-                    ? Column(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(standardCornerRadius),
+              ),
+              duration: Duration(milliseconds: 200),
+              child:
+                  (locationMode.isLocationModeOn)
+                      ? Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           LogoAnimation(100.0, 50.0),
                           Text(
                             "An",
                             style: Theme.of(context).textTheme.bodyMedium,
-                          )
+                          ),
                         ],
                       )
-                    : Column(
+                      : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.play_arrow,
-                            size: 100,
-                          ),
+                          Icon(Icons.play_arrow, size: 100),
                           Text(
                             "Aus",
                             style: Theme.of(context).textTheme.bodyMedium,
-                          )
+                          ),
                         ],
-                      )),
+                      ),
+            ),
           ),
         ],
       ),
@@ -562,36 +594,36 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         children: [
           (countStoryImages < 5)
               ? GestureDetector(
-                  onTap: _pickStoryImage,
-                  child: Container(
-                    width: 200,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      border: Border.all(
-                          color: mainRed, // Set border color
-                          width: 3.0),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.add,
-                          color: mainRed,
-                        ),
-                        Text(
-                          "Story hinzufügen",
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
+                onTap: _pickStoryImage,
+                child: Container(
+                  width: 200,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    border: Border.all(
+                      color: mainRed, // Set border color
+                      width: 3.0,
                     ),
                   ),
-                )
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add, color: mainRed),
+                      Text(
+                        "Story hinzufügen",
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
+              )
               : Container(),
           FutureBuilder<List<Map<String, dynamic>>>(
             future: _futureStoryImages,
-            builder: (BuildContext context,
-                AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+            builder: (
+              BuildContext context,
+              AsyncSnapshot<List<Map<String, dynamic>>> snapshot,
+            ) {
               if (snapshot.hasData && snapshot.data!.length > 0) {
                 return ListView.builder(
                   shrinkWrap: true,
@@ -605,34 +637,37 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         SizedBox.square(
                           dimension: 200,
                           child: Container(
-                              margin: EdgeInsets.all(3),
-                              child: Image.network(image['url'])),
+                            margin: EdgeInsets.all(3),
+                            child: Image.network(image['url']),
+                          ),
                         ),
                         IconButton(
                           icon: Icon(Icons.delete),
                           color: mainRed,
                           onPressed: () {
                             showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: Text('Bild löschen?'),
-                                    actions: <Widget>[
-                                      TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: Text('Abbrechen')),
-                                      TextButton(
-                                        onPressed: () {
-                                          _deleteStoryImage(image['path']);
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text('Okay'),
-                                      )
-                                    ],
-                                  );
-                                });
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text('Bild löschen?'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text('Abbrechen'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        _deleteStoryImage(image['path']);
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text('Okay'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
                           },
                         ),
                       ],
@@ -643,12 +678,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                 return Container();
               } else {
                 return Row(
-                  children: [
-                    SizedBox(
-                      width: 50,
-                    ),
-                    LogoAnimation(100.0, 50.0),
-                  ],
+                  children: [SizedBox(width: 50), LogoAnimation(100.0, 50.0)],
                 );
               }
             },
@@ -669,14 +699,14 @@ class Pins extends StatelessWidget {
     required AnimationController? pinController5,
     required AnimationController? pinController6,
     required AnimationController? pinController7,
-  })  : _pinController1 = pinController1,
-        _pinController2 = pinController2,
-        _pinController3 = pinController3,
-        _pinController4 = pinController4,
-        _pinController5 = pinController5,
-        _pinController6 = pinController6,
-        _pinController7 = pinController7,
-        super(key: key);
+  }) : _pinController1 = pinController1,
+       _pinController2 = pinController2,
+       _pinController3 = pinController3,
+       _pinController4 = pinController4,
+       _pinController5 = pinController5,
+       _pinController6 = pinController6,
+       _pinController7 = pinController7,
+       super(key: key);
 
   final AnimationController? _pinController1;
   final AnimationController? _pinController2;
@@ -690,62 +720,76 @@ class Pins extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Column(children: [
-          FlyingLocationPin(
-            controller: _pinController1!,
-            xRelativeOffset: 0.2,
-            yOffset: 500,
-            color: mainRed,
-          )
-        ]),
-        Column(children: [
-          FlyingLocationPin(
-            controller: _pinController2!,
-            xRelativeOffset: 0.4,
-            yOffset: 400,
-            color: mainRedDark,
-          )
-        ]),
-        Column(children: [
-          FlyingLocationPin(
-            controller: _pinController3!,
-            xRelativeOffset: 0.7,
-            yOffset: 350,
-            color: mainRedLight,
-          )
-        ]),
-        Column(children: [
-          FlyingLocationPin(
-            controller: _pinController4!,
-            xRelativeOffset: 0.9,
-            yOffset: 300,
-            color: mainRed,
-          )
-        ]),
-        Column(children: [
-          FlyingLocationPin(
-            controller: _pinController5!,
-            xRelativeOffset: 0.6,
-            yOffset: 300,
-            color: mainRed,
-          )
-        ]),
-        Column(children: [
-          FlyingLocationPin(
-            controller: _pinController6!,
-            xRelativeOffset: 0.3,
-            yOffset: 500,
-            color: mainRedLight,
-          )
-        ]),
-        Column(children: [
-          FlyingLocationPin(
-            controller: _pinController7!,
-            xRelativeOffset: 0.8,
-            yOffset: 300,
-            color: mainRed,
-          )
-        ]),
+        Column(
+          children: [
+            FlyingLocationPin(
+              controller: _pinController1!,
+              xRelativeOffset: 0.2,
+              yOffset: 500,
+              color: mainRed,
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            FlyingLocationPin(
+              controller: _pinController2!,
+              xRelativeOffset: 0.4,
+              yOffset: 400,
+              color: mainRedDark,
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            FlyingLocationPin(
+              controller: _pinController3!,
+              xRelativeOffset: 0.7,
+              yOffset: 350,
+              color: mainRedLight,
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            FlyingLocationPin(
+              controller: _pinController4!,
+              xRelativeOffset: 0.9,
+              yOffset: 300,
+              color: mainRed,
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            FlyingLocationPin(
+              controller: _pinController5!,
+              xRelativeOffset: 0.6,
+              yOffset: 300,
+              color: mainRed,
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            FlyingLocationPin(
+              controller: _pinController6!,
+              xRelativeOffset: 0.3,
+              yOffset: 500,
+              color: mainRedLight,
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            FlyingLocationPin(
+              controller: _pinController7!,
+              xRelativeOffset: 0.8,
+              yOffset: 300,
+              color: mainRed,
+            ),
+          ],
+        ),
       ],
     );
   }

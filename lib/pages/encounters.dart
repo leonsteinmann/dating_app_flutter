@@ -1,16 +1,16 @@
 import 'dart:ui' as ui;
-import 'package:datingapp/models/encounter.dart';
-import 'package:datingapp/pages/conversation_request.dart';
-import 'package:datingapp/pages/profile.dart';
-import 'package:datingapp/services/database.dart';
-import 'package:datingapp/services/storageManager.dart';
-import 'package:datingapp/values/colors.dart';
-import 'package:datingapp/values/dimensions.dart';
-import 'package:datingapp/values/mapsStyle.dart';
-import 'package:datingapp/widgets/animations/logo_animation.dart';
-import 'package:datingapp/widgets/images.dart';
-import 'package:datingapp/widgets/provider.dart';
-import 'package:datingapp/widgets/userFutureBuilders.dart';
+import 'package:dating_app_flutter/models/encounter.dart';
+import 'package:dating_app_flutter/pages/conversation_request.dart';
+import 'package:dating_app_flutter/pages/profile.dart';
+import 'package:dating_app_flutter/services/database.dart';
+import 'package:dating_app_flutter/services/storageManager.dart';
+import 'package:dating_app_flutter/values/colors.dart';
+import 'package:dating_app_flutter/values/dimensions.dart';
+import 'package:dating_app_flutter/values/mapsStyle.dart';
+import 'package:dating_app_flutter/widgets/animations/logo_animation.dart';
+import 'package:dating_app_flutter/widgets/images.dart';
+import 'package:dating_app_flutter/widgets/provider.dart';
+import 'package:dating_app_flutter/widgets/userFutureBuilders.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -55,17 +55,21 @@ class _EncountersPageState extends State<EncountersPage> {
       selectedEncounter = newEncounter;
     });
     //_listViewController.animateTo(encounterList.indexOf(selectedEncounter!)*140, duration: Duration(milliseconds: 500), curve: Curves.ease);
-    _onAnimateCamera(LatLng(encounterList[selectedEncounter].geoPoint!.latitude,
-        encounterList[selectedEncounter].geoPoint!.longitude));
+    _onAnimateCamera(
+      LatLng(
+        encounterList[selectedEncounter].geoPoint!.latitude,
+        encounterList[selectedEncounter].geoPoint!.longitude,
+      ),
+    );
   }
 
   void _onAnimateCamera(LatLng position) {
     Timer(Duration(milliseconds: 200), () async {
-      await _mapsController!
-          .animateCamera(CameraUpdate.newCameraPosition(CameraPosition(
-        zoom: 15,
-        target: position,
-      )));
+      await _mapsController!.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(zoom: 15, target: position),
+        ),
+      );
     });
   }
 
@@ -93,8 +97,10 @@ class _EncountersPageState extends State<EncountersPage> {
     setState(() {
       isLoadingCounters = true;
     });
-    Provider.of<CurrUser>(context, listen: false)
-        .updateCurrentUser(FirebaseAuth.instance.currentUser?.uid);
+    Provider.of<CurrUser>(
+      context,
+      listen: false,
+    ).updateCurrentUser(FirebaseAuth.instance.currentUser?.uid);
     final currUser = Provider.of<CurrUser>(context, listen: false).currUser;
     List<Encounter> tempEncounters = [];
 
@@ -106,7 +112,9 @@ class _EncountersPageState extends State<EncountersPage> {
         tempEncounters.add(encounter);
       } else {
         Database.moveEncounterToPastEncounters(
-            encounter.idEncounter, currUser.idUser!);
+          encounter.idEncounter,
+          currUser.idUser!,
+        );
       }
     }
 
@@ -124,16 +132,20 @@ class _EncountersPageState extends State<EncountersPage> {
 
   Future<Uint8List> getBytesFromAsset(String path, int width) async {
     ByteData data = await rootBundle.load(path);
-    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
-        targetWidth: width);
+    ui.Codec codec = await ui.instantiateImageCodec(
+      data.buffer.asUint8List(),
+      targetWidth: width,
+    );
     ui.FrameInfo fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
-        .buffer
-        .asUint8List();
+    return (await fi.image.toByteData(
+      format: ui.ImageByteFormat.png,
+    ))!.buffer.asUint8List();
   }
 
   Future<BitmapDescriptor> getBitmapDescriptorFromAssetBytes(
-      String path, int width) async {
+    String path,
+    int width,
+  ) async {
     final Uint8List imageData = await getBytesFromAsset(path, width);
     return BitmapDescriptor.fromBytes(imageData);
   }
@@ -147,12 +159,14 @@ class _EncountersPageState extends State<EncountersPage> {
         position: LatLng(enc.geoPoint!.latitude, enc.geoPoint!.longitude),
         icon: await getBitmapDescriptorFromAssetBytes(locationPinPath, 100),
         onTap: () {
-          _mapsController!.animateCamera(CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: LatLng(enc.geoPoint!.latitude, enc.geoPoint!.longitude),
-              zoom: 15,
+          _mapsController!.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(
+                target: LatLng(enc.geoPoint!.latitude, enc.geoPoint!.longitude),
+                zoom: 15,
+              ),
             ),
-          ));
+          );
           _onEncounterSelected(encounterList.indexOf(enc));
         },
       );
@@ -187,24 +201,24 @@ class _EncountersPageState extends State<EncountersPage> {
           ),
           (isLoadingCounters)
               ? SizedBox(
-                  height: 200,
-                  child: Center(
-                    child: LogoAnimation(200.0, 100.0),
-                  ))
+                height: 200,
+                child: Center(child: LogoAnimation(200.0, 100.0)),
+              )
               : (showSelectedEncounter && encounterList.length > 0)
-                  ? _buildCarousel()
-                  : Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: standardPadding * 2,
-                          vertical: standardPadding * 5),
-                      child: Center(
-                        child: Text(
-                          "Oh! hier ist noch nichts!\nSchalte den Standortmodus an, um Leuten zu begegnen",
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ),
-                    ),
+              ? _buildCarousel()
+              : Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: standardPadding * 2,
+                  vertical: standardPadding * 5,
+                ),
+                child: Center(
+                  child: Text(
+                    "Oh! hier ist noch nichts!\nSchalte den Standortmodus an, um Leuten zu begegnen",
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+              ),
         ],
       ),
     );
@@ -232,14 +246,20 @@ class _EncountersPageState extends State<EncountersPage> {
     return GestureDetector(
       onTap: () {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ProfilePage(
-                    getPeerUser(encounterList[index].users!),
-                    encounterList[index])));
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) => ProfilePage(
+                  getPeerUser(encounterList[index].users!),
+                  encounterList[index],
+                ),
+          ),
+        );
       },
-      child: StoryFutureBuilder(getPeerUser(encounterList[index].users!),
-          size: MediaQuery.of(context).size.width),
+      child: StoryFutureBuilder(
+        getPeerUser(encounterList[index].users!),
+        size: MediaQuery.of(context).size.width,
+      ),
     );
   }
 
@@ -249,8 +269,9 @@ class _EncountersPageState extends State<EncountersPage> {
         controller: _listViewController,
         shrinkWrap: true,
         itemCount: encounterList.length,
-        itemBuilder: (context, index) =>
-            buildEncounterEntry(context, encounterList[index]),
+        itemBuilder:
+            (context, index) =>
+                buildEncounterEntry(context, encounterList[index]),
       ),
     );
   }
@@ -258,14 +279,19 @@ class _EncountersPageState extends State<EncountersPage> {
   Widget buildEncounterEntry(BuildContext context, Encounter encounter) {
     return Padding(
       padding: const EdgeInsets.only(
-          top: standardPadding, left: standardPadding, right: standardPadding),
+        top: standardPadding,
+        left: standardPadding,
+        right: standardPadding,
+      ),
       child: Card(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(standardCornerRadius)),
+          borderRadius: BorderRadius.circular(standardCornerRadius),
+        ),
         elevation: standardElevation,
-        color: (encounterList[selectedEncounter] == encounter)
-            ? Theme.of(context).primaryColorLight
-            : Theme.of(context).cardColor,
+        color:
+            (encounterList[selectedEncounter] == encounter)
+                ? Theme.of(context).primaryColorLight
+                : Theme.of(context).cardColor,
         child: InkWell(
           onTap: () {
             _onEncounterSelected(encounterList.indexOf(encounter));
@@ -276,20 +302,26 @@ class _EncountersPageState extends State<EncountersPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ProfilePage(
-                                  getPeerUser(
-                                      encounterList[selectedEncounter].users!),
-                                  encounter)));
-                    },
-                    child: UserProfileImageFutureBuilder(
-                      getPeerUser(encounter.users!),
-                      profilePictureId: "",
-                      size: 50.0,
-                    )),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => ProfilePage(
+                              getPeerUser(
+                                encounterList[selectedEncounter].users!,
+                              ),
+                              encounter,
+                            ),
+                      ),
+                    );
+                  },
+                  child: UserProfileImageFutureBuilder(
+                    getPeerUser(encounter.users!),
+                    profilePictureId: "",
+                    size: 50.0,
+                  ),
+                ),
                 Padding(
                   padding: EdgeInsets.only(left: standardPadding),
                   child: Column(
@@ -305,29 +337,35 @@ class _EncountersPageState extends State<EncountersPage> {
                         "vor ${DateTime.now().difference(encounter.timestamp!.toDate()).inHours.toString()} Stunden",
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
-                      SizedBox(
-                        height: 10,
-                      ),
+                      SizedBox(height: 10),
                       Row(
                         children: [
                           ElevatedButton(
                             child: Text('Anschreiben'),
                             onPressed: () {
                               Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          ConversationRequestPage(
-                                              encounter: encounterList[
-                                                  selectedEncounter])));
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => ConversationRequestPage(
+                                        encounter:
+                                            encounterList[selectedEncounter],
+                                      ),
+                                ),
+                              );
                             },
                             style: ElevatedButton.styleFrom(
-                                backgroundColor: mainRed,
-                                elevation: 0,
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 5, horizontal: 10),
-                                textStyle: TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.bold)),
+                              backgroundColor: mainRed,
+                              elevation: 0,
+                              padding: EdgeInsets.symmetric(
+                                vertical: 5,
+                                horizontal: 10,
+                              ),
+                              textStyle: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                           /*OutlinedButton(
                             onPressed: () {

@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:datingapp/values/colors.dart';
-import 'package:datingapp/values/dimensions.dart';
-import 'package:datingapp/widgets/provider.dart';
-import 'package:datingapp/widgets/userFutureBuilders.dart';
+import 'package:dating_app_flutter/values/colors.dart';
+import 'package:dating_app_flutter/values/dimensions.dart';
+import 'package:dating_app_flutter/widgets/provider.dart';
+import 'package:dating_app_flutter/widgets/userFutureBuilders.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -54,56 +54,56 @@ class _MyProfilePageState extends State<MyProfilePage> {
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  OwnProfileImagePage(currUser!.idUser!)));
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (context) =>
+                                  OwnProfileImagePage(currUser!.idUser!),
+                        ),
+                      );
                     },
                     child: Hero(
                       tag: "ownProfileImage",
-                      child: UserProfileImageFutureBuilder(currUser!.idUser,
-                          size: 75.0),
+                      child: UserProfileImageFutureBuilder(
+                        currUser!.idUser,
+                        size: 75.0,
+                      ),
                     ),
                   ),
                   CircleAvatar(
                     radius: 20,
                     backgroundColor: Theme.of(context).primaryColorLight,
                     child: IconButton(
-                      icon: Icon(
-                        Icons.camera_alt,
-                        size: 20,
-                      ),
+                      icon: Icon(Icons.camera_alt, size: 20),
                       color: mainRed,
                       onPressed: () {
                         _pickProfilePicture();
                       },
                     ),
-                  )
+                  ),
                 ],
               ),
             ],
           ),
-          SizedBox(
-            height: columnElementsPadding,
-          ),
+          SizedBox(height: columnElementsPadding),
           ListTile(
             leading: Icon(Icons.person),
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Name',
-                    style: GoogleFonts.roboto(
-                      fontSize: 14,
-                      color: explanationTextColor,
-                    )),
-                SizedBox(
-                  height: 3,
+                Text(
+                  'Name',
+                  style: GoogleFonts.roboto(
+                    fontSize: 14,
+                    color: explanationTextColor,
+                  ),
                 ),
-                Text(currUser.username!,
-                    style: Theme.of(context).textTheme.headlineLarge),
-                SizedBox(
-                  height: 3,
+                SizedBox(height: 3),
+                Text(
+                  currUser.username!,
+                  style: Theme.of(context).textTheme.headlineLarge,
                 ),
+                SizedBox(height: 3),
               ],
             ),
             subtitle: Text(
@@ -119,19 +119,19 @@ class _MyProfilePageState extends State<MyProfilePage> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Alter',
-                    style: GoogleFonts.roboto(
-                      fontSize: 14,
-                      color: explanationTextColor,
-                    )),
-                SizedBox(
-                  height: 3,
+                Text(
+                  'Alter',
+                  style: GoogleFonts.roboto(
+                    fontSize: 14,
+                    color: explanationTextColor,
+                  ),
                 ),
-                Text(calculateAge().toString(),
-                    style: Theme.of(context).textTheme.headlineLarge),
-                SizedBox(
-                  height: 3,
+                SizedBox(height: 3),
+                Text(
+                  calculateAge().toString(),
+                  style: Theme.of(context).textTheme.headlineLarge,
                 ),
+                SizedBox(height: 3),
               ],
             ),
             subtitle: Text(
@@ -146,9 +146,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: SizedBox(
               height: 1,
-              child: Container(
-                color: explanationTextColor,
-              ),
+              child: Container(color: explanationTextColor),
             ),
           ),
           ListTile(
@@ -156,19 +154,19 @@ class _MyProfilePageState extends State<MyProfilePage> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Geschlechtsidentität',
-                    style: GoogleFonts.roboto(
-                      fontSize: 14,
-                      color: explanationTextColor,
-                    )),
-                SizedBox(
-                  height: 3,
+                Text(
+                  'Geschlechtsidentität',
+                  style: GoogleFonts.roboto(
+                    fontSize: 14,
+                    color: explanationTextColor,
+                  ),
                 ),
-                Text(buildGenderString(),
-                    style: Theme.of(context).textTheme.headlineLarge),
-                SizedBox(
-                  height: 3,
+                SizedBox(height: 3),
+                Text(
+                  buildGenderString(),
+                  style: Theme.of(context).textTheme.headlineLarge,
                 ),
+                SizedBox(height: 3),
               ],
             ),
             subtitle: Text(
@@ -184,19 +182,19 @@ class _MyProfilePageState extends State<MyProfilePage> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Interessiert an',
-                    style: GoogleFonts.roboto(
-                      fontSize: 14,
-                      color: explanationTextColor,
-                    )),
-                SizedBox(
-                  height: 3,
+                Text(
+                  'Interessiert an',
+                  style: GoogleFonts.roboto(
+                    fontSize: 14,
+                    color: explanationTextColor,
+                  ),
                 ),
-                Text(buildSearchingGenderString(),
-                    style: Theme.of(context).textTheme.headlineLarge),
-                SizedBox(
-                  height: 3,
+                SizedBox(height: 3),
+                Text(
+                  buildSearchingGenderString(),
+                  style: Theme.of(context).textTheme.headlineLarge,
                 ),
+                SizedBox(height: 3),
               ],
             ),
             subtitle: Text(
@@ -214,8 +212,10 @@ class _MyProfilePageState extends State<MyProfilePage> {
 
   void _pickProfilePicture() async {
     //TODO when picking profile picture, textfield is cleared
-    final file = await ImagePicker()
-        .pickImage(source: ImageSource.gallery, imageQuality: 100);
+    final file = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 100,
+    );
     if (file != null) {
       final croppedFile = await ImageCropper().cropImage(
         maxHeight: 500,
@@ -240,9 +240,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
           .ref()
           .child("users/${currFBUser.uid}/${currFBUser.uid}.jpg")
           .putFile(_profileImageFile!)
-          .then((result) => {
-                print(result),
-              });
+          .then((result) => {print(result)});
 
       Directory extStorageDir = await getTemporaryDirectory();
 
@@ -251,8 +249,9 @@ class _MyProfilePageState extends State<MyProfilePage> {
         await userDir.create();
       }
 
-      final currentUserImageDir =
-          Directory('${extStorageDir.path}/users/${currFBUser.uid}');
+      final currentUserImageDir = Directory(
+        '${extStorageDir.path}/users/${currFBUser.uid}',
+      );
       final List<FileSystemEntity> userImageDirList =
           currentUserImageDir.listSync();
       for (var entity in userImageDirList) {
@@ -263,19 +262,23 @@ class _MyProfilePageState extends State<MyProfilePage> {
           }
         }
       }
-      _profileImageFile!
-          .copy("${currentUserImageDir.path}/$profileImageId.jpg");
+      _profileImageFile!.copy(
+        "${currentUserImageDir.path}/$profileImageId.jpg",
+      );
     }
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => OwnProfileImagePage(currFBUser.uid)));
+      context,
+      MaterialPageRoute(
+        builder: (context) => OwnProfileImagePage(currFBUser.uid),
+      ),
+    );
   }
 
   calculateAge() {
     final currUser = Provider.of<CurrUser>(context, listen: false).currUser;
     DateTime tempDate = new DateTime.fromMicrosecondsSinceEpoch(
-        currUser!.birthday!.microsecondsSinceEpoch);
+      currUser!.birthday!.microsecondsSinceEpoch,
+    );
     DateTime currentDate = DateTime.now();
     int age = currentDate.year - tempDate.year;
     int month1 = currentDate.month;

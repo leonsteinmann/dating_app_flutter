@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:datingapp/services/database.dart';
-import 'package:datingapp/widgets/userFutureBuilders.dart';
+import 'package:dating_app_flutter/services/database.dart';
+import 'package:dating_app_flutter/widgets/userFutureBuilders.dart';
 import 'package:flutter/material.dart';
 
 class StoryFutureBuilder extends StatefulWidget {
@@ -53,8 +53,10 @@ class _StoryFutureBuilderState extends State<StoryFutureBuilder> {
       dimension: size,
       child: FutureBuilder<List<Map<String, dynamic>>>(
         future: _futureImages,
-        builder: (BuildContext context,
-            AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+        builder: (
+          BuildContext context,
+          AsyncSnapshot<List<Map<String, dynamic>>> snapshot,
+        ) {
           if (snapshot.hasData && snapshot.data!.length > 0) {
             final Map<String, dynamic> image =
                 snapshot.data![_pos % snapshot.data!.length];
@@ -63,22 +65,19 @@ class _StoryFutureBuilderState extends State<StoryFutureBuilder> {
               children: [
                 Image.network(image['url']),
                 Padding(
-                    padding: EdgeInsets.only(top: 10, left: 10),
-                    child: Column(
-                      children: [
-                        UserProfileImageFutureBuilder(uid),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        UserProfileNameFutureBuilder(
-                          uid,
-                          textStyle: Theme.of(context)
-                              .textTheme
-                              .headlineLarge
-                              ?.copyWith(color: Colors.white),
-                        ),
-                      ],
-                    )),
+                  padding: EdgeInsets.only(top: 10, left: 10),
+                  child: Column(
+                    children: [
+                      UserProfileImageFutureBuilder(uid),
+                      SizedBox(height: 5),
+                      UserProfileNameFutureBuilder(
+                        uid,
+                        textStyle: Theme.of(context).textTheme.headlineLarge
+                            ?.copyWith(color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             );
           } else {
@@ -87,13 +86,9 @@ class _StoryFutureBuilderState extends State<StoryFutureBuilder> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: 50,
-                  ),
+                  SizedBox(height: 50),
                   UserProfileImageFutureBuilder(uid, size: 100.0),
-                  SizedBox(
-                    height: 10,
-                  ),
+                  SizedBox(height: 10),
                   UserProfileNameFutureBuilder(uid),
                 ],
               ),

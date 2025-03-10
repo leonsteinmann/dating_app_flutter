@@ -1,10 +1,10 @@
-import 'package:datingapp/models/user.dart';
-import 'package:datingapp/services/database.dart';
-import 'package:datingapp/values/colors.dart';
-import 'package:datingapp/values/dimensions.dart';
-import 'package:datingapp/widgets/animations/logo_animation.dart';
-import 'package:datingapp/widgets/provider.dart';
-import 'package:datingapp/widgets/userFutureBuilders.dart';
+import 'package:dating_app_flutter/models/user.dart';
+import 'package:dating_app_flutter/services/database.dart';
+import 'package:dating_app_flutter/values/colors.dart';
+import 'package:dating_app_flutter/values/dimensions.dart';
+import 'package:dating_app_flutter/widgets/animations/logo_animation.dart';
+import 'package:dating_app_flutter/widgets/provider.dart';
+import 'package:dating_app_flutter/widgets/userFutureBuilders.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -55,117 +55,139 @@ class _ProfilePageState extends State<ProfilePage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      height: columnElementsPadding,
-                    ),
+                    SizedBox(height: columnElementsPadding),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => OwnProfileImagePage(
-                                        snapshot.data!.idUser!)));
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => OwnProfileImagePage(
+                                      snapshot.data!.idUser!,
+                                    ),
+                              ),
+                            );
                           },
-                          child: UserProfileImageFutureBuilder(user!.idUser,
-                              size: 100.0),
+                          child: UserProfileImageFutureBuilder(
+                            user!.idUser,
+                            size: 100.0,
+                          ),
                         ),
                       ],
                     ),
-                    SizedBox(
-                      height: columnElementsPadding,
+                    SizedBox(height: columnElementsPadding),
+                    Text(
+                      snapshot.data!.username!,
+                      style: Theme.of(context).textTheme.headlineLarge,
                     ),
-                    Text(snapshot.data!.username!,
-                        style: Theme.of(context).textTheme.headlineLarge),
-                    SizedBox(
-                      height: columnElementsPadding,
+                    SizedBox(height: columnElementsPadding),
+                    Text(
+                      calculateAge().toString(),
+                      style: Theme.of(context).textTheme.headlineMedium,
                     ),
-                    Text(calculateAge().toString(),
-                        style: Theme.of(context).textTheme.headlineMedium),
                   ],
                 ),
                 Consumer<ThemeNotifier>(
-                  builder: (context, theme, _) => Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  builder:
+                      (context, theme, _) => Column(
                         children: [
-                          GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: Text('Begegnung entfernen?'),
-                                      content: Text(
-                                          'Die Begegnung wird für euch beide entfernt'),
-                                      actions: <Widget>[
-                                        TextButton(
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text('Begegnung entfernen?'),
+                                        content: Text(
+                                          'Die Begegnung wird für euch beide entfernt',
+                                        ),
+                                        actions: <Widget>[
+                                          TextButton(
                                             onPressed: () {
                                               Navigator.pop(context);
                                             },
-                                            child: Text('Abbrechen')),
-                                        TextButton(
-                                          onPressed: () {
-                                            _deleteEncounter();
-                                            Navigator.pop(context);
-                                            Navigator.pop(context);
-                                          },
-                                          child: Text('Okay'),
-                                        )
-                                      ],
-                                    );
-                                  });
-                            },
-                            child: Container(
-                                width: 120,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: (theme.themeMode == "dark")
-                                      ? darkGray
-                                      : lightGray,
-                                  borderRadius: BorderRadius.circular(
-                                      standardCornerRadius),
-                                ),
-                                child: Center(
+                                            child: Text('Abbrechen'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              _deleteEncounter();
+                                              Navigator.pop(context);
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text('Okay'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                child: Container(
+                                  width: 120,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color:
+                                        (theme.themeMode == "dark")
+                                            ? darkGray
+                                            : lightGray,
+                                    borderRadius: BorderRadius.circular(
+                                      standardCornerRadius,
+                                    ),
+                                  ),
+                                  child: Center(
                                     child: Text(
-                                  "entfernen",
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ))),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          ConversationRequestPage(
-                                              encounter: _encounter)));
-                            },
-                            child: Container(
-                                width: 120,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: mainRed,
-                                  borderRadius: BorderRadius.circular(
-                                      standardCornerRadius),
+                                      "entfernen",
+                                      style:
+                                          Theme.of(
+                                            context,
+                                          ).textTheme.bodyMedium,
+                                    ),
+                                  ),
                                 ),
-                                child: Center(
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => ConversationRequestPage(
+                                            encounter: _encounter,
+                                          ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  width: 120,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: mainRed,
+                                    borderRadius: BorderRadius.circular(
+                                      standardCornerRadius,
+                                    ),
+                                  ),
+                                  child: Center(
                                     child: Text(
-                                  "anschreiben",
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ))),
+                                      "anschreiben",
+                                      style:
+                                          Theme.of(
+                                            context,
+                                          ).textTheme.bodyMedium,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
+                          SizedBox(height: 75),
                         ],
                       ),
-                      SizedBox(
-                        height: 75,
-                      ),
-                    ],
-                  ),
-                )
+                ),
               ],
             );
           } else {
@@ -183,7 +205,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _deleteEncounter() {
     Database.moveEncounterToPastEncounters(
-        _encounter.idEncounter, currFBUser.uid);
+      _encounter.idEncounter,
+      currFBUser.uid,
+    );
     Database.moveEncounterToPastEncounters(_encounter.idEncounter, _idUser);
     print("moved Encounter to old encounter list");
   }
@@ -191,7 +215,8 @@ class _ProfilePageState extends State<ProfilePage> {
   int calculateAge() {
     final currUser = Provider.of<CurrUser>(context, listen: false).currUser;
     DateTime tempDate = new DateTime.fromMicrosecondsSinceEpoch(
-        currUser!.birthday!.microsecondsSinceEpoch);
+      currUser!.birthday!.microsecondsSinceEpoch,
+    );
     DateTime currentDate = DateTime.now();
     int age = currentDate.year - tempDate.year;
     int month1 = currentDate.month;

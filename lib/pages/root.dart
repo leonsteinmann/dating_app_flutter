@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:datingapp/main.dart';
-import 'package:datingapp/pages/login.dart';
-import 'package:datingapp/services/database.dart';
-import 'package:datingapp/values/colors.dart';
-import 'package:datingapp/widgets/images.dart';
-import 'package:datingapp/values/themes.dart';
-import 'package:datingapp/widgets/userFutureBuilders.dart';
+import 'package:dating_app_flutter/main.dart';
+import 'package:dating_app_flutter/pages/login.dart';
+import 'package:dating_app_flutter/services/database.dart';
+import 'package:dating_app_flutter/values/colors.dart';
+import 'package:dating_app_flutter/widgets/images.dart';
+import 'package:dating_app_flutter/values/themes.dart';
+import 'package:dating_app_flutter/widgets/userFutureBuilders.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -43,8 +43,10 @@ class _RootPageState extends State<RootPage> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     _initializeGeoService();
     if (FirebaseAuth.instance.currentUser != null) {
-      Provider.of<CurrUser>(context, listen: false)
-          .updateCurrentUser(FirebaseAuth.instance.currentUser!.uid);
+      Provider.of<CurrUser>(
+        context,
+        listen: false,
+      ).updateCurrentUser(FirebaseAuth.instance.currentUser!.uid);
     }
 
     setupFirebaseMessage();
@@ -75,10 +77,7 @@ class _RootPageState extends State<RootPage> with WidgetsBindingObserver {
   void _handleMessage(RemoteMessage message) {
     if (message.data['event'] == 'conversationMessage') {
       Database.streamConversation(message.data['content']).listen((value) {
-        Navigator.pushNamed(
-          context,
-          '/',
-        );
+        Navigator.pushNamed(context, '/');
       });
     }
   }
@@ -102,10 +101,9 @@ class _RootPageState extends State<RootPage> with WidgetsBindingObserver {
     var fbUser = FirebaseAuth.instance.currentUser;
     String notificationToken = (await firebaseMessaging.getToken())!;
     if (fbUser != null) {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(fbUser.uid)
-          .set({"deviceToken": notificationToken});
+      await FirebaseFirestore.instance.collection('users').doc(fbUser.uid).set({
+        "deviceToken": notificationToken,
+      });
     }
   }
 
@@ -123,8 +121,9 @@ class _RootPageState extends State<RootPage> with WidgetsBindingObserver {
       FirebaseAuth.instance.signOut();
       Timer(Duration(milliseconds: 500), () {
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => MyApp()),
-            (Route<dynamic> route) => false);
+          MaterialPageRoute(builder: (context) => MyApp()),
+          (Route<dynamic> route) => false,
+        );
       });
     }
   }
@@ -164,20 +163,22 @@ class _RootPageState extends State<RootPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeNotifier>(
-      builder: (context, theme, _) => Scaffold(
-        appBar: buildAppBar(theme, context),
-        body: Center(
-          child: IndexedStack(
-            index: selectedView,
-            children: allTabs.map<Widget>((Tab tab) {
-              return TabView(tab: tab, key: new UniqueKey());
-            }).toList(),
-          ),
-        ),
-        /*floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked, //specify the location of the FAB
+      builder:
+          (context, theme, _) => Scaffold(
+            appBar: buildAppBar(theme, context),
+            body: Center(
+              child: IndexedStack(
+                index: selectedView,
+                children:
+                    allTabs.map<Widget>((Tab tab) {
+                      return TabView(tab: tab, key: new UniqueKey());
+                    }).toList(),
+              ),
+            ),
+            /*floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked, //specify the location of the FAB
         floatingActionButton: buildFloatingActionButton(context),*/
-        bottomNavigationBar: buildBottomAppBar(context),
-      ),
+            bottomNavigationBar: buildBottomAppBar(context),
+          ),
     );
   }
 
@@ -194,9 +195,11 @@ class _RootPageState extends State<RootPage> with WidgetsBindingObserver {
           },
           child: Container(
             child: Center(
-                child: location_pin_custom(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    size: bottomAppBarIconSize)),
+              child: location_pin_custom(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                size: bottomAppBarIconSize,
+              ),
+            ),
           ),
         ),
       ),
@@ -216,79 +219,95 @@ class _RootPageState extends State<RootPage> with WidgetsBindingObserver {
       actions: [
         GestureDetector(
           onTap: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => MyProfilePage()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MyProfilePage()),
+            );
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Hero(
               tag: "ownProfileImage",
-              child: (FirebaseAuth.instance.currentUser != null)
-                  ? UserProfileImageFutureBuilder(
-                      FirebaseAuth.instance.currentUser!.uid,
-                      size: 20.0,
-                    )
-                  : CircleAvatar(
-                      radius: 20,
-                      backgroundImage: AssetImage(defaultUserImagePath),
-                    ),
+              child:
+                  (FirebaseAuth.instance.currentUser != null)
+                      ? UserProfileImageFutureBuilder(
+                        FirebaseAuth.instance.currentUser!.uid,
+                        size: 20.0,
+                      )
+                      : CircleAvatar(
+                        radius: 20,
+                        backgroundImage: AssetImage(defaultUserImagePath),
+                      ),
             ),
           ),
         ),
         PopupMenuButton(
           child: Padding(
             padding: const EdgeInsets.only(
-                right: standardPadding, bottom: 8.0, top: 8.0),
+              right: standardPadding,
+              bottom: 8.0,
+              top: 8.0,
+            ),
             child: Icon(Icons.more_vert, color: mainRed),
           ),
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              value: 'darkMode',
-              child: Consumer<ThemeNotifier>(
-                builder: (context, theme, _) => GestureDetector(
+          itemBuilder:
+              (context) => [
+                PopupMenuItem(
+                  value: 'darkMode',
+                  child: Consumer<ThemeNotifier>(
+                    builder:
+                        (context, theme, _) => GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context, 'darkMode');
+                            if (theme.themeMode == 'dark') {
+                              theme.setLightMode();
+                            } else {
+                              theme.setDarkMode();
+                            }
+                          },
+                          child: Text("DarkMode an/aus"),
+                        ),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'createUser',
+                  child: GestureDetector(
                     onTap: () {
-                      Navigator.pop(context, 'darkMode');
-                      if (theme.themeMode == 'dark') {
-                        theme.setLightMode();
-                      } else {
-                        theme.setDarkMode();
-                      }
-                    },
-                    child: Text("DarkMode an/aus")),
-              ),
-            ),
-            PopupMenuItem(
-              value: 'createUser',
-              child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context, 'createUser');
-                    Navigator.push(
+                      Navigator.pop(context, 'createUser');
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => CreateUserPage()));
-                  },
-                  child: Text("Profil erstellen")),
-            ),
-            PopupMenuItem(
-              value: 'login',
-              child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context, 'login');
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => LoginPage()));
-                  },
-                  child: Text("SignUp")),
-            ),
-            PopupMenuItem(
-              value: 'signOut',
-              child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context, 'signOut');
-                    signOut();
-                  },
-                  child: Text("SignOut")),
-            ),
-          ],
+                          builder: (context) => CreateUserPage(),
+                        ),
+                      );
+                    },
+                    child: Text("Profil erstellen"),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'login',
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context, 'login');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginPage()),
+                      );
+                    },
+                    child: Text("SignUp"),
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'signOut',
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context, 'signOut');
+                      signOut();
+                    },
+                    child: Text("SignOut"),
+                  ),
+                ),
+              ],
         ),
       ],
     );

@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:datingapp/services/authentification.dart';
-import 'package:datingapp/values/colors.dart';
-import 'package:datingapp/values/dimensions.dart';
-import 'package:datingapp/widgets/images.dart';
-import 'package:datingapp/values/themes.dart';
+import 'package:dating_app_flutter/services/authentification.dart';
+import 'package:dating_app_flutter/values/colors.dart';
+import 'package:dating_app_flutter/values/dimensions.dart';
+import 'package:dating_app_flutter/widgets/images.dart';
+import 'package:dating_app_flutter/values/themes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -35,87 +35,84 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-    _termsConditionRecognizer = TapGestureRecognizer()
-      ..onTap = () {
-        /*Navigator.of(context).push(MaterialPageRoute(
+    _termsConditionRecognizer =
+        TapGestureRecognizer()
+          ..onTap = () {
+            /*Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => PageTermsOfUse(),
         ));*/
-      };
-    _privacyPolicyRecognizer = TapGestureRecognizer()
-      ..onTap = () {
-        /*Navigator.of(context).push(MaterialPageRoute(
+          };
+    _privacyPolicyRecognizer =
+        TapGestureRecognizer()
+          ..onTap = () {
+            /*Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => PrivacyPage(),
         ));*/
-      };
+          };
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeNotifier>(
-      builder: (context, theme, _) => Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        appBar: AppBar(
-          title: logo_custom(
-            size: 50,
-            color: (theme.themeMode == "dark") ? mainRed : mainRed,
+      builder:
+          (context, theme, _) => Scaffold(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            appBar: AppBar(
+              title: logo_custom(
+                size: 50,
+                color: (theme.themeMode == "dark") ? mainRed : mainRed,
+              ),
+            ),
+            body: Padding(
+              padding: EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: standardPadding * 3,
+              ),
+              child: Center(
+                child:
+                    (!_isCheckingUserExists)
+                        ? ListView(
+                          children: <Widget>[
+                            SizedBox(height: standardPadding * 3),
+                            buildRegisterSwitch(),
+                            buildEmailTextForm(),
+                            SizedBox(height: standardPadding),
+                            buildPasswordForm(),
+                            (_isShowingRegister)
+                                ? buildSecondPasswordForm()
+                                : forgotPasswordButton(),
+                            SizedBox(height: standardPadding),
+                            buildSignUpButton(),
+                            (_errorMessage != "")
+                                ? Center(child: Text(_errorMessage))
+                                : Container(),
+                            SizedBox(height: standardPadding * 2),
+                            _signInButtons(theme),
+                            SizedBox(height: standardPadding * 2),
+                            (_isShowingRegister)
+                                ? buildAcceptCheckBox(context)
+                                : Container(),
+                          ],
+                        )
+                        : Center(child: CircularProgressIndicator()),
+              ),
+            ),
           ),
-        ),
-        body: Padding(
-          padding: EdgeInsets.symmetric(
-              vertical: 10, horizontal: standardPadding * 3),
-          child: Center(
-            child: (!_isCheckingUserExists)
-                ? ListView(
-                    children: <Widget>[
-                      SizedBox(
-                        height: standardPadding * 3,
-                      ),
-                      buildRegisterSwitch(),
-                      buildEmailTextForm(),
-                      SizedBox(
-                        height: standardPadding,
-                      ),
-                      buildPasswordForm(),
-                      (_isShowingRegister)
-                          ? buildSecondPasswordForm()
-                          : forgotPasswordButton(),
-                      SizedBox(
-                        height: standardPadding,
-                      ),
-                      buildSignUpButton(),
-                      (_errorMessage != "")
-                          ? Center(child: Text(_errorMessage))
-                          : Container(),
-                      SizedBox(
-                        height: standardPadding * 2,
-                      ),
-                      _signInButtons(theme),
-                      SizedBox(
-                        height: standardPadding * 2,
-                      ),
-                      (_isShowingRegister)
-                          ? buildAcceptCheckBox(context)
-                          : Container(),
-                    ],
-                  )
-                : Center(
-                    child: CircularProgressIndicator(),
-                  ),
-          ),
-        ),
-      ),
     );
   }
 
   Container buildAcceptCheckBox(BuildContext context) {
     return Container(
-      decoration: (_isShowingCheckBoxHint)
-          ? BoxDecoration(
-              border: Border.all(color: mainRed, width: 3),
-              color:
-                  (_isShowingCheckBoxHint) ? Theme.of(context).cardColor : null,
-            )
-          : null,
+      decoration:
+          (_isShowingCheckBoxHint)
+              ? BoxDecoration(
+                border: Border.all(color: mainRed, width: 3),
+                color:
+                    (_isShowingCheckBoxHint)
+                        ? Theme.of(context).cardColor
+                        : null,
+              )
+              : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -133,26 +130,34 @@ class _LoginPageState extends State<LoginPage> {
                 },
               ),
               Flexible(
-                  child: RichText(
-                      text: TextSpan(style: TextStyle(height: 1.0), children: [
-                TextSpan(
-                    text: "Ich habe die ",
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium!
-                        .copyWith(fontSize: 11)),
-                TextSpan(
-                    text: "Nutzungsbedingungen",
-                    recognizer: _termsConditionRecognizer,
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        fontSize: 11, decoration: TextDecoration.underline)),
-                TextSpan(
-                    text: " gelesen und akzeptiere diese",
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium!
-                        .copyWith(fontSize: 11)),
-              ])))
+                child: RichText(
+                  text: TextSpan(
+                    style: TextStyle(height: 1.0),
+                    children: [
+                      TextSpan(
+                        text: "Ich habe die ",
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium!.copyWith(fontSize: 11),
+                      ),
+                      TextSpan(
+                        text: "Nutzungsbedingungen",
+                        recognizer: _termsConditionRecognizer,
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          fontSize: 11,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                      TextSpan(
+                        text: " gelesen und akzeptiere diese",
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium!.copyWith(fontSize: 11),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
           Row(
@@ -169,28 +174,36 @@ class _LoginPageState extends State<LoginPage> {
                 },
               ),
               Flexible(
-                  child: RichText(
-                      text: TextSpan(style: TextStyle(height: 1.0), children: [
-                TextSpan(
-                    text: "Ich habe die ",
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium!
-                        .copyWith(fontSize: 11)),
-                TextSpan(
-                    text: "Datenschutzerklärung",
-                    recognizer: _privacyPolicyRecognizer,
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        fontSize: 11, decoration: TextDecoration.underline)),
-                TextSpan(
-                    text: " gelesen und akzeptiere diese",
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium!
-                        .copyWith(fontSize: 11)),
-              ])))
+                child: RichText(
+                  text: TextSpan(
+                    style: TextStyle(height: 1.0),
+                    children: [
+                      TextSpan(
+                        text: "Ich habe die ",
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium!.copyWith(fontSize: 11),
+                      ),
+                      TextSpan(
+                        text: "Datenschutzerklärung",
+                        recognizer: _privacyPolicyRecognizer,
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          fontSize: 11,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                      TextSpan(
+                        text: " gelesen und akzeptiere diese",
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium!.copyWith(fontSize: 11),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
-          )
+          ),
         ],
       ),
     );
@@ -217,9 +230,7 @@ class _LoginPageState extends State<LoginPage> {
             });
           },
         ),
-        SizedBox(
-          width: standardPadding,
-        ),
+        SizedBox(width: standardPadding),
         ElevatedButton(
           child: Text('Login'),
           onPressed: () {
@@ -237,11 +248,12 @@ class _LoginPageState extends State<LoginPage> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         TextButton(
-            onPressed: () {},
-            child: Text(
-              "Passwort vergessen?",
-              style: Theme.of(context).textTheme.bodyMedium,
-            )),
+          onPressed: () {},
+          child: Text(
+            "Passwort vergessen?",
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
       ],
     );
   }
@@ -326,30 +338,28 @@ class _LoginPageState extends State<LoginPage> {
     return Column(
       children: [
         Text("oder weiter mit:"),
-        SizedBox(
-          height: standardPadding,
-        ),
+        SizedBox(height: standardPadding),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             (Theme.of(context).platform == TargetPlatform.iOS)
                 ? GestureDetector(
-                    onTap: _onSignInWithAppleTapped,
-                    child: SizedBox(
-                      width: 60,
-                      height: 60,
-                      child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8.0),
-                          child: (themeNotifier.themeMode == "dark")
+                  onTap: _onSignInWithAppleTapped,
+                  child: SizedBox(
+                    width: 60,
+                    height: 60,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child:
+                          (themeNotifier.themeMode == "dark")
                               ? Image.asset(appleLogoWhitePath)
-                              : Image.asset(appleLogoBlackPath)),
+                              : Image.asset(appleLogoBlackPath),
                     ),
-                  )
+                  ),
+                )
                 : Container(),
             (Theme.of(context).platform == TargetPlatform.iOS)
-                ? SizedBox(
-                    width: 20.0,
-                  )
+                ? SizedBox(width: 20.0)
                 : Container(),
             GestureDetector(
               onTap: _onSignInWithGoogleTapped,
@@ -359,9 +369,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Image.asset(googleLogoPath),
               ),
             ),
-            SizedBox(
-              height: 20.0,
-            ),
+            SizedBox(height: 20.0),
             //(_isShowingCheckBoxHint) ? Text("Deine Einstimmung wird noch benötigt", style: termsWarningTextStyle,) : Container(),
           ],
         ),
@@ -405,7 +413,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _onSignInWithEmailTapped(
-      String email, String password, String confirmPassword) async {
+    String email,
+    String password,
+    String confirmPassword,
+  ) async {
     if (!_isShowingRegister) {
       try {
         UserCredential userCredential = await FirebaseAuth.instance
@@ -491,16 +502,20 @@ class _LoginPageState extends State<LoginPage> {
     });
     if (userDoc.exists) {
       Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => MyApp()),
-          (Route<dynamic> route) => false);
+        MaterialPageRoute(builder: (context) => MyApp()),
+        (Route<dynamic> route) => false,
+      );
       //Provider.of<CurrUser>(context, listen: true).updateCurrentUser(uid);
     } else {
       bool successUserCreation = await Navigator.push(
-          context, MaterialPageRoute(builder: (context) => CreateUserPage()));
+        context,
+        MaterialPageRoute(builder: (context) => CreateUserPage()),
+      );
       if (successUserCreation) {
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => MyApp()),
-            (Route<dynamic> route) => false);
+          MaterialPageRoute(builder: (context) => MyApp()),
+          (Route<dynamic> route) => false,
+        );
         //Provider.of<CurrUser>(context, listen: true).updateCurrentUser(uid);
       }
     }

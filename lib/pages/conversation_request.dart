@@ -1,13 +1,13 @@
 import 'dart:math' as math;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:datingapp/models/encounter.dart';
-import 'package:datingapp/values/colors.dart';
-import 'package:datingapp/values/dimensions.dart';
-import 'package:datingapp/widgets/animations/flying_location_pin.dart';
-import 'package:datingapp/widgets/images.dart';
-import 'package:datingapp/values/themes.dart';
-import 'package:datingapp/widgets/userFutureBuilders.dart';
+import 'package:dating_app_flutter/models/encounter.dart';
+import 'package:dating_app_flutter/values/colors.dart';
+import 'package:dating_app_flutter/values/dimensions.dart';
+import 'package:dating_app_flutter/widgets/animations/flying_location_pin.dart';
+import 'package:dating_app_flutter/widgets/images.dart';
+import 'package:dating_app_flutter/values/themes.dart';
+import 'package:dating_app_flutter/widgets/userFutureBuilders.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,8 +25,12 @@ class ConversationRequestPage extends StatefulWidget {
 
 class _ConversationRequestPage extends State<ConversationRequestPage>
     with TickerProviderStateMixin {
-  Encounter encounter =
-      Encounter("", [], GeoPoint(0, 0), Timestamp.fromDate(DateTime.now()));
+  Encounter encounter = Encounter(
+    "",
+    [],
+    GeoPoint(0, 0),
+    Timestamp.fromDate(DateTime.now()),
+  );
 
   String peerUserId = "";
   bool _hasSendRequest = false;
@@ -49,19 +53,33 @@ class _ConversationRequestPage extends State<ConversationRequestPage>
     super.initState();
     peerUserId = getPeerUser(encounter.users!);
     _pinController1 = AnimationController(
-        duration: const Duration(milliseconds: 2000), vsync: this);
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
     _pinController2 = AnimationController(
-        duration: const Duration(milliseconds: 3000), vsync: this);
+      duration: const Duration(milliseconds: 3000),
+      vsync: this,
+    );
     _pinController3 = AnimationController(
-        duration: const Duration(milliseconds: 5000), vsync: this);
+      duration: const Duration(milliseconds: 5000),
+      vsync: this,
+    );
     _pinController4 = AnimationController(
-        duration: const Duration(milliseconds: 4000), vsync: this);
+      duration: const Duration(milliseconds: 4000),
+      vsync: this,
+    );
     _pinController5 = AnimationController(
-        duration: const Duration(milliseconds: 7500), vsync: this);
+      duration: const Duration(milliseconds: 7500),
+      vsync: this,
+    );
     _pinController6 = AnimationController(
-        duration: const Duration(milliseconds: 4500), vsync: this);
+      duration: const Duration(milliseconds: 4500),
+      vsync: this,
+    );
     _pinController7 = AnimationController(
-        duration: const Duration(milliseconds: 3300), vsync: this);
+      duration: const Duration(milliseconds: 3300),
+      vsync: this,
+    );
   }
 
   @override
@@ -111,9 +129,9 @@ class _ConversationRequestPage extends State<ConversationRequestPage>
       _hasSendRequest = true;
     });
 
-    final createConversationRequest =
-        FirebaseFunctions.instanceFor(region: "europe-west3")
-            .httpsCallable('createConversation');
+    final createConversationRequest = FirebaseFunctions.instanceFor(
+      region: "europe-west3",
+    ).httpsCallable('createConversation');
     final message = {
       'idConversation': encounter.idEncounter,
       'idFrom': currFBUser.uid,
@@ -125,34 +143,30 @@ class _ConversationRequestPage extends State<ConversationRequestPage>
         'idTo': getPeerUser(encounter.users!),
         'timestamp': Timestamp.fromDate(DateTime.now()).seconds,
         'content': content,
-        'read': false
+        'read': false,
       },
     };
     print(message);
-    await createConversationRequest(message).then((result) => {
-          print(result),
-        });
+    await createConversationRequest(message).then((result) => {print(result)});
 
     final DocumentReference messageDoc = _db
         .collection('conversations')
         .doc(encounter.idEncounter)
         .collection('messages')
         .doc(
-            "${currFBUser.uid + "_" + DateTime.now().millisecondsSinceEpoch.toString()}");
+          "${currFBUser.uid + "_" + DateTime.now().millisecondsSinceEpoch.toString()}",
+        );
 
     _db.runTransaction((Transaction transaction) async {
-      await transaction.set(
-        messageDoc,
-        <String, dynamic>{
-          'content': content,
-          'idFrom': currFBUser.uid,
-          'idMessage':
-              "${currFBUser.uid + "_" + DateTime.now().millisecondsSinceEpoch.toString()}",
-          'idTo': peerUserId,
-          'read': false,
-          'timestamp': Timestamp.fromDate(DateTime.now()),
-        },
-      );
+      await transaction.set(messageDoc, <String, dynamic>{
+        'content': content,
+        'idFrom': currFBUser.uid,
+        'idMessage':
+            "${currFBUser.uid + "_" + DateTime.now().millisecondsSinceEpoch.toString()}",
+        'idTo': peerUserId,
+        'read': false,
+        'timestamp': Timestamp.fromDate(DateTime.now()),
+      });
     });
     setState(() {
       _hasCreatedConversation = true;
@@ -163,208 +177,234 @@ class _ConversationRequestPage extends State<ConversationRequestPage>
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeNotifier>(
-      builder: (context, theme, _) => Scaffold(
-        appBar: AppBar(),
-        body: Stack(
-          alignment: Alignment.bottomCenter,
-          children: [
-            Column(children: [
-              FlyingLocationPin(
-                controller: _pinController1!,
-                xRelativeOffset: 0.2,
-                yOffset: 300,
-                color: mainRed,
-              )
-            ]),
-            Column(children: [
-              FlyingLocationPin(
-                controller: _pinController2!,
-                xRelativeOffset: 0.4,
-                yOffset: 400,
-                color: mainRedDark,
-              )
-            ]),
-            Column(children: [
-              FlyingLocationPin(
-                controller: _pinController3!,
-                xRelativeOffset: 0.7,
-                yOffset: 350,
-                color: mainRedLight,
-              )
-            ]),
-            Column(children: [
-              FlyingLocationPin(
-                controller: _pinController4!,
-                xRelativeOffset: 0.9,
-                yOffset: 300,
-                color: mainRed,
-              )
-            ]),
-            Column(children: [
-              FlyingLocationPin(
-                controller: _pinController5!,
-                xRelativeOffset: 0.6,
-                yOffset: 300,
-                color: mainRed,
-              )
-            ]),
-            Column(children: [
-              FlyingLocationPin(
-                controller: _pinController6!,
-                xRelativeOffset: 0.3,
-                yOffset: 350,
-                color: mainRedLight,
-              )
-            ]),
-            Column(children: [
-              FlyingLocationPin(
-                controller: _pinController7!,
-                xRelativeOffset: 0.8,
-                yOffset: 300,
-                color: mainRed,
-              )
-            ]),
-            Padding(
-              padding: const EdgeInsets.all(standardPadding),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  //image
-                  ListView(
-                    shrinkWrap: true,
+      builder:
+          (context, theme, _) => Scaffold(
+            appBar: AppBar(),
+            body: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                Column(
+                  children: [
+                    FlyingLocationPin(
+                      controller: _pinController1!,
+                      xRelativeOffset: 0.2,
+                      yOffset: 300,
+                      color: mainRed,
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    FlyingLocationPin(
+                      controller: _pinController2!,
+                      xRelativeOffset: 0.4,
+                      yOffset: 400,
+                      color: mainRedDark,
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    FlyingLocationPin(
+                      controller: _pinController3!,
+                      xRelativeOffset: 0.7,
+                      yOffset: 350,
+                      color: mainRedLight,
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    FlyingLocationPin(
+                      controller: _pinController4!,
+                      xRelativeOffset: 0.9,
+                      yOffset: 300,
+                      color: mainRed,
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    FlyingLocationPin(
+                      controller: _pinController5!,
+                      xRelativeOffset: 0.6,
+                      yOffset: 300,
+                      color: mainRed,
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    FlyingLocationPin(
+                      controller: _pinController6!,
+                      xRelativeOffset: 0.3,
+                      yOffset: 350,
+                      color: mainRedLight,
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    FlyingLocationPin(
+                      controller: _pinController7!,
+                      xRelativeOffset: 0.8,
+                      yOffset: 300,
+                      color: mainRed,
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(standardPadding),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
+                      //image
+                      ListView(
+                        shrinkWrap: true,
                         children: [
-                          SizedBox(
-                            height: standardPadding,
-                          ),
-                          Stack(
-                            alignment: Alignment.center,
+                          Column(
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                              SizedBox(height: standardPadding),
+                              Stack(
+                                alignment: Alignment.center,
                                 children: [
-                                  Transform.rotate(
-                                    angle: -28.5 * math.pi / 180,
-                                    child: Stack(
-                                      alignment: Alignment.topCenter,
-                                      children: [
-                                        location_pin_custom(
-                                            color: mainRed, size: 150.0),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 10.0),
-                                          child: UserProfileImageFutureBuilder(
-                                            peerUserId,
-                                            size: 40.0,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 85,
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    width: 85,
-                                  ),
-                                  Transform.rotate(
-                                    angle: 28.5 * math.pi / 180,
-                                    child: Stack(
-                                      alignment: Alignment.topCenter,
-                                      children: [
-                                        location_pin_custom(
-                                            color: mainRed, size: 150.0),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 10.0),
-                                          child: UserProfileImageFutureBuilder(
-                                            currFBUser.uid,
-                                            size: 40.0,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          Text(
-                            (!_hasCreatedConversation)
-                                ? "Mach den ersten Schritt..."
-                                : "Nachricht zugestellt!",
-                            style: Theme.of(context).textTheme.headlineMedium,
-                          ),
-                          Text(
-                            (!_hasCreatedConversation)
-                                ? "Mit der ersten Nachricht stellt du eine Kontaktanfrage."
-                                : "Klasse! Der erste Schritt ist getan. Jetzt heißt es abwarten. \nAber Vorfreude ist ja bekanntlich die schönste Freude.",
-                            style: Theme.of(context).textTheme.bodyMedium,
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(
-                            height: standardPadding * 2,
-                          ),
-                          (_hasSendRequest && !_hasCreatedConversation)
-                              ? CircularProgressIndicator()
-                              : Container(),
-                          (_hasSendRequest && _hasCreatedConversation)
-                              ? Container(
-                                  margin: EdgeInsets.symmetric(
-                                      vertical: standardPadding / 2,
-                                      horizontal: standardPadding * 2),
-                                  child: Row(
+                                  Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Flexible(
-                                        child: Container(
+                                      Transform.rotate(
+                                        angle: -28.5 * math.pi / 180,
+                                        child: Stack(
+                                          alignment: Alignment.topCenter,
+                                          children: [
+                                            location_pin_custom(
+                                              color: mainRed,
+                                              size: 150.0,
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                top: 10.0,
+                                              ),
+                                              child:
+                                                  UserProfileImageFutureBuilder(
+                                                    peerUserId,
+                                                    size: 40.0,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(width: 85),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(width: 85),
+                                      Transform.rotate(
+                                        angle: 28.5 * math.pi / 180,
+                                        child: Stack(
+                                          alignment: Alignment.topCenter,
+                                          children: [
+                                            location_pin_custom(
+                                              color: mainRed,
+                                              size: 150.0,
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                top: 10.0,
+                                              ),
+                                              child:
+                                                  UserProfileImageFutureBuilder(
+                                                    currFBUser.uid,
+                                                    size: 40.0,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                (!_hasCreatedConversation)
+                                    ? "Mach den ersten Schritt..."
+                                    : "Nachricht zugestellt!",
+                                style:
+                                    Theme.of(context).textTheme.headlineMedium,
+                              ),
+                              Text(
+                                (!_hasCreatedConversation)
+                                    ? "Mit der ersten Nachricht stellt du eine Kontaktanfrage."
+                                    : "Klasse! Der erste Schritt ist getan. Jetzt heißt es abwarten. \nAber Vorfreude ist ja bekanntlich die schönste Freude.",
+                                style: Theme.of(context).textTheme.bodyMedium,
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: standardPadding * 2),
+                              (_hasSendRequest && !_hasCreatedConversation)
+                                  ? CircularProgressIndicator()
+                                  : Container(),
+                              (_hasSendRequest && _hasCreatedConversation)
+                                  ? Container(
+                                    margin: EdgeInsets.symmetric(
+                                      vertical: standardPadding / 2,
+                                      horizontal: standardPadding * 2,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Flexible(
+                                          child: Container(
                                             decoration: new BoxDecoration(
-                                              color: (theme.themeMode == "dark")
-                                                  ? ownMessageDarkScheme
-                                                  : ownMessageLightScheme,
+                                              color:
+                                                  (theme.themeMode == "dark")
+                                                      ? ownMessageDarkScheme
+                                                      : ownMessageLightScheme,
                                               borderRadius:
                                                   new BorderRadius.all(
-                                                const Radius.circular(
-                                                    chatBubbleRadius),
-                                              ),
+                                                    const Radius.circular(
+                                                      chatBubbleRadius,
+                                                    ),
+                                                  ),
                                               boxShadow: [
                                                 BoxShadow(
-                                                  color: Theme.of(context)
-                                                      .shadowColor,
+                                                  color:
+                                                      Theme.of(
+                                                        context,
+                                                      ).shadowColor,
                                                   offset: Offset(0.0, 1.0),
                                                   blurRadius: 3.0,
                                                 ),
                                               ],
                                             ),
                                             padding: const EdgeInsets.all(
-                                                standardPadding * 1.5),
+                                              standardPadding * 1.5,
+                                            ),
                                             child: Text(
-                                                textEditingController.text,
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .bodyMedium)),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              : Container(),
+                                              textEditingController.text,
+                                              style:
+                                                  Theme.of(
+                                                    context,
+                                                  ).textTheme.bodyMedium,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                  : Container(),
+                            ],
+                          ),
                         ],
                       ),
+                      (!_hasSendRequest) ? buildInput() : Container(),
                     ],
                   ),
-                  (!_hasSendRequest) ? buildInput() : Container(),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -380,16 +420,17 @@ class _ConversationRequestPage extends State<ConversationRequestPage>
             Flexible(
               child: Container(
                 child: Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: TextField(
-                      autofocus: true,
-                      minLines: 1,
-                      maxLines: 5,
-                      controller: textEditingController,
-                      decoration: const InputDecoration.collapsed(
-                        hintText: 'Schreibe eine Nachricht',
-                      ),
-                    )),
+                  padding: const EdgeInsets.all(5.0),
+                  child: TextField(
+                    autofocus: true,
+                    minLines: 1,
+                    maxLines: 5,
+                    controller: textEditingController,
+                    decoration: const InputDecoration.collapsed(
+                      hintText: 'Schreibe eine Nachricht',
+                    ),
+                  ),
+                ),
               ),
             ),
             Container(

@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:datingapp/values/colors.dart';
-import 'package:datingapp/values/dimensions.dart';
-import 'package:datingapp/widgets/images.dart';
-import 'package:datingapp/values/themes.dart';
+import 'package:dating_app_flutter/values/colors.dart';
+import 'package:dating_app_flutter/values/dimensions.dart';
+import 'package:dating_app_flutter/widgets/images.dart';
+import 'package:dating_app_flutter/values/themes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +58,9 @@ class _CreateUserPageState extends State<CreateUserPage> {
         return;
       }
       pageController.nextPage(
-          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
       setState(() {
         _currentPage = _currentPage + 1;
       });
@@ -67,9 +69,9 @@ class _CreateUserPageState extends State<CreateUserPage> {
         return;
       } else {
         //final createUserRequest = FirebaseFunctions.instance.httpsCallable('createUser');
-        final createUserRequest =
-            FirebaseFunctions.instanceFor(region: "europe-west3")
-                .httpsCallable('createUser');
+        final createUserRequest = FirebaseFunctions.instanceFor(
+          region: "europe-west3",
+        ).httpsCallable('createUser');
         final message = {
           'username': _username,
           'idProfilePicture': _username,
@@ -81,17 +83,17 @@ class _CreateUserPageState extends State<CreateUserPage> {
         setState(() {
           _isCreatingUser = true;
         });
-        await createUserRequest(message).then((result) => {
-              print("triggered createUser"),
-              print(result),
-            });
+        await createUserRequest(
+          message,
+        ).then((result) => {print("triggered createUser"), print(result)});
         await _saveProfilePicture();
         setState(() {
           _isCreatingUser = false;
         });
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => NavigatorPage()),
-            (Route<dynamic> route) => false);
+          MaterialPageRoute(builder: (context) => NavigatorPage()),
+          (Route<dynamic> route) => false,
+        );
         print("create User");
       }
     }
@@ -99,8 +101,10 @@ class _CreateUserPageState extends State<CreateUserPage> {
 
   void _pickProfilePicture() async {
     //TODO when picking profile picture, textfield is cleared
-    final file = await ImagePicker()
-        .pickImage(source: ImageSource.gallery, imageQuality: 30);
+    final file = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 30,
+    );
     if (file != null) {
       final croppedFile = await ImageCropper().cropImage(
         sourcePath: file.path,
@@ -127,8 +131,9 @@ class _CreateUserPageState extends State<CreateUserPage> {
         await userDir.create();
       }
 
-      final currentUserImageDir =
-          Directory('${extStorageDir.path}/users/${currFBUser.uid}');
+      final currentUserImageDir = Directory(
+        '${extStorageDir.path}/users/${currFBUser.uid}',
+      );
       final List<FileSystemEntity> userImageDirList =
           currentUserImageDir.listSync();
       for (var entity in userImageDirList) {
@@ -139,8 +144,9 @@ class _CreateUserPageState extends State<CreateUserPage> {
           }
         }
       }
-      _profileImageFile!
-          .copy("${currentUserImageDir.path}/$profileImageId.jpg");
+      _profileImageFile!.copy(
+        "${currentUserImageDir.path}/$profileImageId.jpg",
+      );
     }
   }
 
@@ -160,15 +166,16 @@ class _CreateUserPageState extends State<CreateUserPage> {
 
   /// This builds material date picker in Android
   buildMaterialDatePicker(BuildContext context) async {
-    final DateTime picked = (await showDatePicker(
-      locale: Locale('de', 'DE'),
-      context: context,
-      initialDate: _selectedDate.toDate(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now().subtract(Duration(days: 6574)),
-      initialEntryMode: DatePickerEntryMode.input,
-      initialDatePickerMode: DatePickerMode.year,
-    ))!;
+    final DateTime picked =
+        (await showDatePicker(
+          locale: Locale('de', 'DE'),
+          context: context,
+          initialDate: _selectedDate.toDate(),
+          firstDate: DateTime(1900),
+          lastDate: DateTime.now().subtract(Duration(days: 6574)),
+          initialEntryMode: DatePickerEntryMode.input,
+          initialDatePickerMode: DatePickerMode.year,
+        ))!;
     if (picked != _selectedDate)
       setState(() {
         _selectedDate = Timestamp.fromDate(picked);
@@ -178,27 +185,26 @@ class _CreateUserPageState extends State<CreateUserPage> {
   /// This builds cupertion date picker in iOS
   buildCupertinoDatePicker(BuildContext context) {
     showModalBottomSheet(
-        context: context,
-        builder: (BuildContext builder) {
-          return Container(
-            height: MediaQuery.of(context).copyWith().size.height / 3,
-            color: Colors.white,
-            child: CupertinoDatePicker(
-              mode: CupertinoDatePickerMode.date,
-              onDateTimeChanged: (picked) {
-                if (picked != _selectedDate)
-                  setState(() {
-                    _selectedDate = Timestamp.fromDate(picked);
-                  });
-              },
-              initialDateTime: _selectedDate.toDate(),
-              maximumDate: DateTime.now().subtract(Duration(days: 6574)),
-              minimumDate: DateTime(
-                1900,
-              ),
-            ),
-          );
-        });
+      context: context,
+      builder: (BuildContext builder) {
+        return Container(
+          height: MediaQuery.of(context).copyWith().size.height / 3,
+          color: Colors.white,
+          child: CupertinoDatePicker(
+            mode: CupertinoDatePickerMode.date,
+            onDateTimeChanged: (picked) {
+              if (picked != _selectedDate)
+                setState(() {
+                  _selectedDate = Timestamp.fromDate(picked);
+                });
+            },
+            initialDateTime: _selectedDate.toDate(),
+            maximumDate: DateTime.now().subtract(Duration(days: 6574)),
+            minimumDate: DateTime(1900),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -206,96 +212,104 @@ class _CreateUserPageState extends State<CreateUserPage> {
     screenWidth = MediaQuery.of(context).size.width;
     screenHeight = MediaQuery.of(context).size.height;
     return Consumer<ThemeNotifier>(
-      builder: (context, theme, _) => Scaffold(
-          floatingActionButton: FloatingActionButton(
-            child: (_isCreatingUser)
-                ? CircularProgressIndicator(
-                    backgroundColor: lightIconColor,
-                  )
-                : Icon(Icons.navigate_next),
-            onPressed: () {
-              if (!_isCreatingUser) {
-                onForwardPressed();
-              }
-            },
-          ),
-          body: SafeArea(
-            child: Stack(
-              alignment: Alignment.topCenter,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 70),
-                  child: PageView(
-                    physics: NeverScrollableScrollPhysics(),
-                    controller: pageController,
-                    children: [
-                      createPageUsername(),
-                      createPageProfileImage(),
-                      createPageBirthday(),
-                      createPageGender(),
-                      createPageSearchingGender(),
-                    ],
+      builder:
+          (context, theme, _) => Scaffold(
+            floatingActionButton: FloatingActionButton(
+              child:
+                  (_isCreatingUser)
+                      ? CircularProgressIndicator(
+                        backgroundColor: lightIconColor,
+                      )
+                      : Icon(Icons.navigate_next),
+              onPressed: () {
+                if (!_isCreatingUser) {
+                  onForwardPressed();
+                }
+              },
+            ),
+            body: SafeArea(
+              child: Stack(
+                alignment: Alignment.topCenter,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 70),
+                    child: PageView(
+                      physics: NeverScrollableScrollPhysics(),
+                      controller: pageController,
+                      children: [
+                        createPageUsername(),
+                        createPageProfileImage(),
+                        createPageBirthday(),
+                        createPageGender(),
+                        createPageSearchingGender(),
+                      ],
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(25),
-                  child: Stack(
-                    alignment: Alignment.centerLeft,
-                    children: [
-                      ClipRRect(
-                        child: SizedBox(
+                  Padding(
+                    padding: const EdgeInsets.all(25),
+                    child: Stack(
+                      alignment: Alignment.centerLeft,
+                      children: [
+                        ClipRRect(
+                          child: SizedBox(
                             width: screenWidth - 40,
                             height: 20,
                             child: Container(
-                                color: (theme.themeMode == "dark")
-                                    ? darkGray
-                                    : lightGray)),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      ClipRRect(
-                        child: SizedBox(
-                          width: (screenWidth - 40) / 5 * _currentPage,
-                          height: 20,
-                          child: Container(
-                            color: mainRed,
+                              color:
+                                  (theme.themeMode == "dark")
+                                      ? darkGray
+                                      : lightGray,
+                            ),
                           ),
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
-                        borderRadius: BorderRadius.circular(10.0),
-                      )
-                    ],
+                        ClipRRect(
+                          child: SizedBox(
+                            width: (screenWidth - 40) / 5 * _currentPage,
+                            height: 20,
+                            child: Container(color: mainRed),
+                          ),
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Row(
-                      children: [
-                        IconButton(
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Row(
+                        children: [
+                          IconButton(
                             icon: Icon(Icons.navigate_before_rounded),
                             onPressed: () {
                               if (_currentPage > 1) {
                                 pageController.previousPage(
-                                    duration: Duration(milliseconds: 300),
-                                    curve: Curves.easeOut);
+                                  duration: Duration(milliseconds: 300),
+                                  curve: Curves.easeOut,
+                                );
                                 setState(() {
                                   _currentPage = _currentPage - 1;
                                 });
                               }
-                            }),
-                      ],
-                    ),
-                  ],
-                )
-              ],
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          )),
+          ),
     );
   }
 
   Padding createPageUsername() {
     return Padding(
       padding: const EdgeInsets.only(
-          left: standardPadding * 3, right: standardPadding * 3),
+        left: standardPadding * 3,
+        right: standardPadding * 3,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -303,16 +317,12 @@ class _CreateUserPageState extends State<CreateUserPage> {
             "Wie lautet dein Vorname?",
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          SizedBox(
-            height: standardPadding,
-          ),
+          SizedBox(height: standardPadding),
           Text(
             "Deinen Namen kannst du später nicht mehr ändern.",
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          SizedBox(
-            height: standardPadding * 2,
-          ),
+          SizedBox(height: standardPadding * 2),
           Material(
             elevation: 5,
             child: TextFormField(
@@ -324,8 +334,10 @@ class _CreateUserPageState extends State<CreateUserPage> {
                 fillColor: Theme.of(context).cardColor,
                 filled: true,
                 hintText: 'Gib deinen Vornamen ein',
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 20,
+                ),
               ),
               validator: (input) {
                 if (input == "") {
@@ -336,7 +348,7 @@ class _CreateUserPageState extends State<CreateUserPage> {
               },
               onChanged: (input) => _username = input,
             ),
-          )
+          ),
         ],
       ),
     );
@@ -345,7 +357,9 @@ class _CreateUserPageState extends State<CreateUserPage> {
   Padding createPageProfileImage() {
     return Padding(
       padding: const EdgeInsets.only(
-          left: standardPadding * 3, right: standardPadding * 3),
+        left: standardPadding * 3,
+        right: standardPadding * 3,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -353,16 +367,12 @@ class _CreateUserPageState extends State<CreateUserPage> {
             "Füge dein Profilfoto hinzu",
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          SizedBox(
-            height: standardPadding,
-          ),
+          SizedBox(height: standardPadding),
           Text(
             "Wähle ein Foto von dir, dass Leute die du getroffen hast dich Wiedererkennen. Das Bild kannst du später ändern.",
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          SizedBox(
-            height: standardPadding * 2,
-          ),
+          SizedBox(height: standardPadding * 2),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -377,9 +387,10 @@ class _CreateUserPageState extends State<CreateUserPage> {
                       tag: "ownProfileImage",
                       child: CircleAvatar(
                         radius: 75,
-                        backgroundImage: (_profileImage != null)
-                            ? _profileImage!.image
-                            : AssetImage(defaultUserImagePath),
+                        backgroundImage:
+                            (_profileImage != null)
+                                ? _profileImage!.image
+                                : AssetImage(defaultUserImagePath),
                       ),
                     ),
                   ),
@@ -387,16 +398,13 @@ class _CreateUserPageState extends State<CreateUserPage> {
                     radius: 20,
                     backgroundColor: Theme.of(context).primaryColorLight,
                     child: IconButton(
-                      icon: Icon(
-                        Icons.camera_alt,
-                        size: 20,
-                      ),
+                      icon: Icon(Icons.camera_alt, size: 20),
                       color: mainRed,
                       onPressed: () {
                         _pickProfilePicture();
                       },
                     ),
-                  )
+                  ),
                 ],
               ),
             ],
@@ -409,7 +417,9 @@ class _CreateUserPageState extends State<CreateUserPage> {
   Padding createPageBirthday() {
     return Padding(
       padding: const EdgeInsets.only(
-          left: standardPadding * 3, right: standardPadding * 3),
+        left: standardPadding * 3,
+        right: standardPadding * 3,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -417,16 +427,12 @@ class _CreateUserPageState extends State<CreateUserPage> {
             "Wann hast du Geburtstag?",
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          SizedBox(
-            height: standardPadding,
-          ),
+          SizedBox(height: standardPadding),
           Text(
             "Deinen Begegnungen wird nur dein Alter angezeigt, nicht dein Geburtstag.",
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          SizedBox(
-            height: standardPadding * 2,
-          ),
+          SizedBox(height: standardPadding * 2),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -438,21 +444,21 @@ class _CreateUserPageState extends State<CreateUserPage> {
                         .split(' ')[0],
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
-                  SizedBox(
-                    height: 20.0,
-                  ),
+                  SizedBox(height: 20.0),
                   ElevatedButton(
                     onPressed: () => _selectDate(context), // Refer step 3
                     child: Text(
                       'Datum auswählen',
                       style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
               ),
             ],
-          )
+          ),
         ],
       ),
     );
@@ -461,7 +467,9 @@ class _CreateUserPageState extends State<CreateUserPage> {
   Padding createPageGender() {
     return Padding(
       padding: const EdgeInsets.only(
-          left: standardPadding * 3, right: standardPadding * 3),
+        left: standardPadding * 3,
+        right: standardPadding * 3,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -469,16 +477,12 @@ class _CreateUserPageState extends State<CreateUserPage> {
             "Wie identifizierst du dich?",
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          SizedBox(
-            height: standardPadding,
-          ),
+          SizedBox(height: standardPadding),
           Text(
             "Jeder verfällt dem Liebeswahn!",
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          SizedBox(
-            height: standardPadding * 2,
-          ),
+          SizedBox(height: standardPadding * 2),
           GestureDetector(
             onTap: () {
               setState(() {
@@ -486,29 +490,29 @@ class _CreateUserPageState extends State<CreateUserPage> {
               });
             },
             child: Material(
-                elevation: (_selectedGender == 'female') ? 0 : 5,
-                color: (_selectedGender == 'female')
-                    ? mainRed
-                    : Theme.of(context).cardColor,
-                child: Row(
-                  children: [
-                    Container(
-                        padding: EdgeInsets.all(standardPadding * 2),
-                        child: Text(
-                          "Weiblich",
-                          style: (_selectedGender == 'female')
-                              ? Theme.of(context)
-                                  .textTheme
-                                  .headlineMedium!
+              elevation: (_selectedGender == 'female') ? 0 : 5,
+              color:
+                  (_selectedGender == 'female')
+                      ? mainRed
+                      : Theme.of(context).cardColor,
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(standardPadding * 2),
+                    child: Text(
+                      "Weiblich",
+                      style:
+                          (_selectedGender == 'female')
+                              ? Theme.of(context).textTheme.headlineMedium!
                                   .copyWith(color: Colors.white)
                               : Theme.of(context).textTheme.headlineMedium,
-                        )),
-                  ],
-                )),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          SizedBox(
-            height: standardPadding,
-          ),
+          SizedBox(height: standardPadding),
           GestureDetector(
             onTap: () {
               setState(() {
@@ -516,29 +520,29 @@ class _CreateUserPageState extends State<CreateUserPage> {
               });
             },
             child: Material(
-                elevation: (_selectedGender == 'male') ? 0 : 5,
-                color: (_selectedGender == 'male')
-                    ? mainRed
-                    : Theme.of(context).cardColor,
-                child: Row(
-                  children: [
-                    Container(
-                        padding: EdgeInsets.all(standardPadding * 2),
-                        child: Text(
-                          "Männlich",
-                          style: (_selectedGender == 'male')
-                              ? Theme.of(context)
-                                  .textTheme
-                                  .headlineMedium!
+              elevation: (_selectedGender == 'male') ? 0 : 5,
+              color:
+                  (_selectedGender == 'male')
+                      ? mainRed
+                      : Theme.of(context).cardColor,
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(standardPadding * 2),
+                    child: Text(
+                      "Männlich",
+                      style:
+                          (_selectedGender == 'male')
+                              ? Theme.of(context).textTheme.headlineMedium!
                                   .copyWith(color: Colors.white)
                               : Theme.of(context).textTheme.headlineMedium,
-                        )),
-                  ],
-                )),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          SizedBox(
-            height: standardPadding,
-          ),
+          SizedBox(height: standardPadding),
           GestureDetector(
             onTap: () {
               setState(() {
@@ -546,26 +550,28 @@ class _CreateUserPageState extends State<CreateUserPage> {
               });
             },
             child: Material(
-                elevation: (_selectedGender == 'nonBinary') ? 0 : 5,
-                color: (_selectedGender == 'nonBinary')
-                    ? mainRed
-                    : Theme.of(context).cardColor,
-                child: Row(
-                  children: [
-                    Container(
-                        padding: EdgeInsets.all(standardPadding * 2),
-                        child: Text(
-                          "Nicht-binär",
-                          style: (_selectedGender == 'nonBinary')
-                              ? Theme.of(context)
-                                  .textTheme
-                                  .headlineMedium!
+              elevation: (_selectedGender == 'nonBinary') ? 0 : 5,
+              color:
+                  (_selectedGender == 'nonBinary')
+                      ? mainRed
+                      : Theme.of(context).cardColor,
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(standardPadding * 2),
+                    child: Text(
+                      "Nicht-binär",
+                      style:
+                          (_selectedGender == 'nonBinary')
+                              ? Theme.of(context).textTheme.headlineMedium!
                                   .copyWith(color: Colors.white)
                               : Theme.of(context).textTheme.headlineMedium,
-                        )),
-                  ],
-                )),
-          )
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -574,7 +580,9 @@ class _CreateUserPageState extends State<CreateUserPage> {
   Padding createPageSearchingGender() {
     return Padding(
       padding: const EdgeInsets.only(
-          left: standardPadding * 3, right: standardPadding * 3),
+        left: standardPadding * 3,
+        right: standardPadding * 3,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -582,16 +590,12 @@ class _CreateUserPageState extends State<CreateUserPage> {
             "An wem bist du interessiert?",
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          SizedBox(
-            height: standardPadding,
-          ),
+          SizedBox(height: standardPadding),
           Text(
             "Dir werden nur passende Begegnungen angezeigt.",
             style: Theme.of(context).textTheme.bodyMedium,
           ),
-          SizedBox(
-            height: standardPadding * 2,
-          ),
+          SizedBox(height: standardPadding * 2),
           GestureDetector(
             onTap: () {
               setState(() {
@@ -599,29 +603,29 @@ class _CreateUserPageState extends State<CreateUserPage> {
               });
             },
             child: Material(
-                elevation: (_selectedSearchingGender == 'women') ? 0 : 5,
-                color: (_selectedSearchingGender == 'women')
-                    ? mainRed
-                    : Theme.of(context).cardColor,
-                child: Row(
-                  children: [
-                    Container(
-                        padding: EdgeInsets.all(standardPadding * 2),
-                        child: Text(
-                          "Frauen",
-                          style: (_selectedSearchingGender == 'women')
-                              ? Theme.of(context)
-                                  .textTheme
-                                  .headlineMedium!
+              elevation: (_selectedSearchingGender == 'women') ? 0 : 5,
+              color:
+                  (_selectedSearchingGender == 'women')
+                      ? mainRed
+                      : Theme.of(context).cardColor,
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(standardPadding * 2),
+                    child: Text(
+                      "Frauen",
+                      style:
+                          (_selectedSearchingGender == 'women')
+                              ? Theme.of(context).textTheme.headlineMedium!
                                   .copyWith(color: Colors.white)
                               : Theme.of(context).textTheme.headlineMedium,
-                        )),
-                  ],
-                )),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          SizedBox(
-            height: standardPadding,
-          ),
+          SizedBox(height: standardPadding),
           GestureDetector(
             onTap: () {
               setState(() {
@@ -629,29 +633,29 @@ class _CreateUserPageState extends State<CreateUserPage> {
               });
             },
             child: Material(
-                elevation: (_selectedSearchingGender == 'men') ? 0 : 5,
-                color: (_selectedSearchingGender == 'men')
-                    ? mainRed
-                    : Theme.of(context).cardColor,
-                child: Row(
-                  children: [
-                    Container(
-                        padding: EdgeInsets.all(standardPadding * 2),
-                        child: Text(
-                          "Männern",
-                          style: (_selectedSearchingGender == 'men')
-                              ? Theme.of(context)
-                                  .textTheme
-                                  .headlineMedium!
+              elevation: (_selectedSearchingGender == 'men') ? 0 : 5,
+              color:
+                  (_selectedSearchingGender == 'men')
+                      ? mainRed
+                      : Theme.of(context).cardColor,
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(standardPadding * 2),
+                    child: Text(
+                      "Männern",
+                      style:
+                          (_selectedSearchingGender == 'men')
+                              ? Theme.of(context).textTheme.headlineMedium!
                                   .copyWith(color: Colors.white)
                               : Theme.of(context).textTheme.headlineMedium,
-                        )),
-                  ],
-                )),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          SizedBox(
-            height: standardPadding,
-          ),
+          SizedBox(height: standardPadding),
           GestureDetector(
             onTap: () {
               setState(() {
@@ -659,26 +663,28 @@ class _CreateUserPageState extends State<CreateUserPage> {
               });
             },
             child: Material(
-                elevation: (_selectedSearchingGender == 'any') ? 0 : 5,
-                color: (_selectedSearchingGender == 'any')
-                    ? mainRed
-                    : Theme.of(context).cardColor,
-                child: Row(
-                  children: [
-                    Container(
-                        padding: EdgeInsets.all(standardPadding * 2),
-                        child: Text(
-                          "Jedem",
-                          style: (_selectedSearchingGender == 'any')
-                              ? Theme.of(context)
-                                  .textTheme
-                                  .headlineMedium!
+              elevation: (_selectedSearchingGender == 'any') ? 0 : 5,
+              color:
+                  (_selectedSearchingGender == 'any')
+                      ? mainRed
+                      : Theme.of(context).cardColor,
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(standardPadding * 2),
+                    child: Text(
+                      "Jedem",
+                      style:
+                          (_selectedSearchingGender == 'any')
+                              ? Theme.of(context).textTheme.headlineMedium!
                                   .copyWith(color: Colors.white)
                               : Theme.of(context).textTheme.headlineMedium,
-                        )),
-                  ],
-                )),
-          )
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

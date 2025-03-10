@@ -1,4 +1,4 @@
-import 'package:datingapp/services/database.dart';
+import 'package:dating_app_flutter/services/database.dart';
 import 'package:flutter/material.dart';
 
 class OwnProfileImagePage extends StatefulWidget {
@@ -21,9 +21,7 @@ class _OwnProfileImagePageState extends State<OwnProfileImagePage> {
           child: FutureBuilder<Image>(
             future: Database.getProfileImage(widget.uid),
             builder: (BuildContext context, AsyncSnapshot<Image> snapshot) {
-              return Image(
-                image: snapshot.data!.image,
-              );
+              return Image(image: snapshot.data!.image);
             },
           ),
         ),
@@ -50,9 +48,7 @@ class _PeerProfileImagePageState extends State<PeerProfileImagePage> {
         child: FutureBuilder<Image>(
           future: Database.getProfileImage(widget.uid),
           builder: (BuildContext context, AsyncSnapshot<Image> snapshot) {
-            return Image(
-              image: snapshot.data!.image,
-            );
+            return Image(image: snapshot.data!.image);
           },
         ),
       ),

@@ -1,16 +1,12 @@
-//
-//  RunnerTests.swift
-//  RunnerTests
-//
-//  Created by Leon Privat on 10.03.2025.
-//
+import Flutter
+import UIKit
+import XCTest
 
-import Testing
+class RunnerTests: XCTestCase {
 
-struct RunnerTests {
-
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
-    }
+  func testExample() {
+    // If you add code to the Runner application, consider adding tests here.
+    // See https://developer.apple.com/documentation/xctest for more information about using XCTest.
+  }
 
 }

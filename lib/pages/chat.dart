@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:datingapp/models/conversation.dart';
-import 'package:datingapp/models/message.dart';
-import 'package:datingapp/services/database.dart';
-import 'package:datingapp/values/colors.dart';
-import 'package:datingapp/values/dimensions.dart';
-import 'package:datingapp/values/themes.dart';
-import 'package:datingapp/widgets/userFutureBuilders.dart';
+import 'package:dating_app_flutter/models/conversation.dart';
+import 'package:dating_app_flutter/models/message.dart';
+import 'package:dating_app_flutter/services/database.dart';
+import 'package:dating_app_flutter/values/colors.dart';
+import 'package:dating_app_flutter/values/dimensions.dart';
+import 'package:dating_app_flutter/values/themes.dart';
+import 'package:dating_app_flutter/widgets/userFutureBuilders.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,18 +13,16 @@ import 'package:provider/provider.dart';
 import 'profile_Image_pages.dart';
 
 class ChatPage extends StatefulWidget {
-  ChatPage({required this.conversation});
+  const ChatPage({required this.conversation});
 
   final Conversation conversation;
 
   @override
-  State createState() {
-    return _ChatPageState(conversation: conversation);
-  }
+  State createState() => _ChatPageState(conversation: conversation);
 }
 
 class _ChatPageState extends State<ChatPage> {
-  Conversation conversation = Conversation();
+  final Conversation conversation;
   String peerUserId = "";
   final currFBUser = FirebaseAuth.instance.currentUser!;
   final TextEditingController textEditingController = TextEditingController();
@@ -48,87 +46,91 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeNotifier>(
-      builder: (context, theme, _) => Scaffold(
-        appBar: AppBar(
-          title: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => OwnProfileImagePage(peerUserId)));
-            },
-            child: Row(
+      builder:
+          (context, theme, _) => Scaffold(
+            appBar: AppBar(
+              title: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => OwnProfileImagePage(peerUserId),
+                    ),
+                  );
+                },
+                child: Row(
+                  children: [
+                    UserProfileImageFutureBuilder(peerUserId, size: 20.0),
+                    SizedBox(width: standardPadding),
+                    UserProfileNameFutureBuilder(
+                      peerUserId,
+                      textStyle: Theme.of(
+                        context,
+                      ).textTheme.headlineLarge!.copyWith(color: mainRed),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                PopupMenuButton(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(Icons.more_vert, color: mainRed),
+                  ),
+                  itemBuilder:
+                      (context) => [
+                        PopupMenuItem(
+                          child: GestureDetector(child: Text("Nutzer melden")),
+                        ),
+                      ],
+                ),
+              ],
+            ),
+            body: Stack(
               children: [
-                UserProfileImageFutureBuilder(
-                  peerUserId,
-                  size: 20.0,
-                ),
-                SizedBox(
-                  width: standardPadding,
-                ),
-                UserProfileNameFutureBuilder(
-                  peerUserId,
-                  textStyle:
-                      Theme.of(context).textTheme.headlineLarge!.copyWith(
-                            color: mainRed,
-                          ),
+                StreamBuilder(
+                  stream: Database.streamConversation(
+                    conversation.idConversation!,
+                  ),
+                  builder: (
+                    BuildContext context,
+                    AsyncSnapshot<Conversation> snapshot,
+                  ) {
+                    if (snapshot.hasError) {
+                      print(snapshot.error);
+                      return Center(
+                        child: Text("Etwas ist schief gelaufen..."),
+                      );
+                    }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (!snapshot.hasData) {
+                      return Center(child: Text("Snapshot has no data"));
+                    }
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        buildMessages(theme, context, snapshot.data!),
+                        (!snapshot.data!.accepted! &&
+                                snapshot.data!.lastMessage!.idTo ==
+                                    FirebaseAuth.instance.currentUser!.uid)
+                            ? buildAcceptButtons(context, snapshot.data!)
+                            : Container(),
+                        (snapshot.data!.userStatus![conversation.users![0]] ==
+                                    true &&
+                                snapshot.data!.userStatus![conversation
+                                        .users![1]] ==
+                                    true)
+                            ? buildInput(theme)
+                            : Container(),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
           ),
-          actions: [
-            PopupMenuButton(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(Icons.more_vert, color: mainRed),
-              ),
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  child: GestureDetector(child: Text("Nutzer melden")),
-                ),
-              ],
-            ),
-          ],
-        ),
-        body: Stack(
-          children: [
-            StreamBuilder(
-              stream: Database.streamConversation(conversation.idConversation!),
-              builder:
-                  (BuildContext context, AsyncSnapshot<Conversation> snapshot) {
-                if (snapshot.hasError) {
-                  print(snapshot.error);
-                  return Center(child: Text("Etwas ist schief gelaufen..."));
-                }
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
-                if (!snapshot.hasData) {
-                  return Center(child: Text("Snapshot has no data"));
-                }
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    buildMessages(theme, context, snapshot.data!),
-                    (!snapshot.data!.accepted! &&
-                            snapshot.data!.lastMessage!.idTo ==
-                                FirebaseAuth.instance.currentUser!.uid)
-                        ? buildAcceptButtons(context, snapshot.data!)
-                        : Container(),
-                    (snapshot.data!.userStatus![conversation.users![0]] ==
-                                true &&
-                            snapshot.data!
-                                    .userStatus![conversation.users![1]] ==
-                                true)
-                        ? buildInput(theme)
-                        : Container(),
-                  ],
-                );
-              },
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -140,13 +142,8 @@ class _ChatPageState extends State<ChatPage> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.done,
-                color: Colors.white,
-              ),
-              SizedBox(
-                width: 5,
-              ),
+              Icon(Icons.done, color: Colors.white),
+              SizedBox(width: 5),
               Text('Anfrage akzeptieren'),
             ],
           ),
@@ -154,16 +151,16 @@ class _ChatPageState extends State<ChatPage> {
             Database.acceptConversationRequest(con);
           },
         ),
-        ElevatedButton(
-          child: Text('Anfrage ablehnen'),
-          onPressed: () {},
-        ),
+        ElevatedButton(child: Text('Anfrage ablehnen'), onPressed: () {}),
       ],
     );
   }
 
   Widget buildMessages(
-      ThemeNotifier themeNotifier, BuildContext context, Conversation con) {
+    ThemeNotifier themeNotifier,
+    BuildContext context,
+    Conversation con,
+  ) {
     return Flexible(
       child: GestureDetector(
         onTap: () {
@@ -171,8 +168,10 @@ class _ChatPageState extends State<ChatPage> {
         },
         child: StreamBuilder(
           stream: Database.streamConversationMessages(con.idConversation!),
-          builder:
-              (BuildContext context, AsyncSnapshot<List<Message>> snapshot) {
+          builder: (
+            BuildContext context,
+            AsyncSnapshot<List<Message>> snapshot,
+          ) {
             if (snapshot.hasError) {
               print(snapshot.error);
               return Center(child: Text("Etwas ist schief gelaufen..."));
@@ -189,8 +188,12 @@ class _ChatPageState extends State<ChatPage> {
               shrinkWrap: true,
               reverse: true,
               itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) => buildMessageEntry(
-                  themeNotifier, index, snapshot.data![index]),
+              itemBuilder:
+                  (context, index) => buildMessageEntry(
+                    themeNotifier,
+                    index,
+                    snapshot.data![index],
+                  ),
               controller: listScrollController,
             );
           },
@@ -200,21 +203,27 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget buildMessageEntry(
-      ThemeNotifier themeNotifier, int index, Message message) {
+    ThemeNotifier themeNotifier,
+    int index,
+    Message message,
+  ) {
     if (message.idFrom == FirebaseAuth.instance.currentUser!.uid) {
       // Right (my message)
       return Container(
         margin: EdgeInsets.symmetric(
-            vertical: standardPadding / 2, horizontal: standardPadding),
+          vertical: standardPadding / 2,
+          horizontal: standardPadding,
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Flexible(
               child: Container(
                 decoration: new BoxDecoration(
-                  color: (themeNotifier.themeMode == "dark")
-                      ? ownMessageDarkScheme
-                      : ownMessageLightScheme,
+                  color:
+                      (themeNotifier.themeMode == "dark")
+                          ? ownMessageDarkScheme
+                          : ownMessageLightScheme,
                   borderRadius: new BorderRadius.only(
                     topLeft: const Radius.circular(chatBubbleRadius),
                     bottomLeft: const Radius.circular(chatBubbleRadius),
@@ -239,35 +248,40 @@ class _ChatPageState extends State<ChatPage> {
       // Left (peer message)
       return Container(
         margin: EdgeInsets.symmetric(
-            vertical: standardPadding / 2, horizontal: standardPadding),
+          vertical: standardPadding / 2,
+          horizontal: standardPadding,
+        ),
         child: Column(
           children: <Widget>[
-            Row(children: <Widget>[
-              Flexible(
-                child: Container(
-                  //width: MediaQuery.of(context).size.width*2/3,
-                  decoration: new BoxDecoration(
-                    color: (themeNotifier.themeMode == "dark")
-                        ? peerMessageDarkScheme
-                        : peerMessageLightScheme,
-                    borderRadius: new BorderRadius.only(
-                      topRight: const Radius.circular(chatBubbleRadius),
-                      bottomRight: const Radius.circular(chatBubbleRadius),
-                      bottomLeft: const Radius.circular(chatBubbleRadius),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Theme.of(context).shadowColor,
-                        offset: Offset(0.0, 1.0),
-                        blurRadius: 3.0,
+            Row(
+              children: <Widget>[
+                Flexible(
+                  child: Container(
+                    //width: MediaQuery.of(context).size.width*2/3,
+                    decoration: new BoxDecoration(
+                      color:
+                          (themeNotifier.themeMode == "dark")
+                              ? peerMessageDarkScheme
+                              : peerMessageLightScheme,
+                      borderRadius: new BorderRadius.only(
+                        topRight: const Radius.circular(chatBubbleRadius),
+                        bottomRight: const Radius.circular(chatBubbleRadius),
+                        bottomLeft: const Radius.circular(chatBubbleRadius),
                       ),
-                    ],
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).shadowColor,
+                          offset: Offset(0.0, 1.0),
+                          blurRadius: 3.0,
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(standardPadding * 1.5),
+                    child: Text(message.content!),
                   ),
-                  padding: const EdgeInsets.all(standardPadding * 1.5),
-                  child: Text(message.content!),
                 ),
-              )
-            ])
+              ],
+            ),
           ],
           crossAxisAlignment: CrossAxisAlignment.start,
         ),
@@ -279,27 +293,32 @@ class _ChatPageState extends State<ChatPage> {
     return Container(
       padding: const EdgeInsets.all(20.0),
       decoration: new BoxDecoration(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(50), topRight: Radius.circular(50)),
-          color: (themeNotifier.themeMode == "dark")
-              ? ownMessageDarkScheme
-              : ownMessageLightScheme),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(50),
+          topRight: Radius.circular(50),
+        ),
+        color:
+            (themeNotifier.themeMode == "dark")
+                ? ownMessageDarkScheme
+                : ownMessageLightScheme,
+      ),
       child: Row(
         children: <Widget>[
           // Edit text
           Flexible(
             child: Container(
               child: Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: TextField(
-                    autofocus: true,
-                    minLines: 1,
-                    maxLines: 5,
-                    controller: textEditingController,
-                    decoration: const InputDecoration.collapsed(
-                      hintText: 'Schreibe eine Nachricht',
-                    ),
-                  )),
+                padding: const EdgeInsets.all(5.0),
+                child: TextField(
+                  autofocus: true,
+                  minLines: 1,
+                  maxLines: 5,
+                  controller: textEditingController,
+                  decoration: const InputDecoration.collapsed(
+                    hintText: 'Schreibe eine Nachricht',
+                  ),
+                ),
+              ),
             ),
           ),
           Container(
@@ -319,17 +338,26 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void onSendMessage(String content) {
-    final peerUserId = (currFBUser.uid == conversation.users![0])
-        ? conversation.users![1]
-        : conversation.users![0];
+    final peerUserId =
+        (currFBUser.uid == conversation.users![0])
+            ? conversation.users![1]
+            : conversation.users![0];
 
     if (content.trim() != '') {
       textEditingController.clear();
       content = content.trim();
-      Database.sendMessage(conversation.idConversation!, currFBUser.uid,
-          peerUserId, content, Timestamp.now());
-      listScrollController.animateTo(0.0,
-          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+      Database.sendMessage(
+        conversation.idConversation!,
+        currFBUser.uid,
+        peerUserId,
+        content,
+        Timestamp.now(),
+      );
+      listScrollController.animateTo(
+        0.0,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
     }
   }
 }

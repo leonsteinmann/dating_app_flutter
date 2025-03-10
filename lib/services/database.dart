@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:io';
 import 'package:async/async.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:datingapp/models/conversation.dart';
-import 'package:datingapp/models/encounter.dart';
-import 'package:datingapp/models/message.dart';
-import 'package:datingapp/models/user.dart';
+import 'package:dating_app_flutter/models/conversation.dart';
+import 'package:dating_app_flutter/models/encounter.dart';
+import 'package:dating_app_flutter/models/message.dart';
+import 'package:dating_app_flutter/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,10 +22,11 @@ class Database {
           .doc(encounterID)
           .get()
           .then((DocumentSnapshot<Map<String, dynamic>> encounterSnapshot) {
-        Encounter requestedEncounter =
-            Encounter.fromSnapshot(encounterSnapshot);
-        return encounter = requestedEncounter;
-      });
+            Encounter requestedEncounter = Encounter.fromSnapshot(
+              encounterSnapshot,
+            );
+            return encounter = requestedEncounter;
+          });
       print("Got Encounter from Firestore: " + encounter.idEncounter!);
       return encounter;
     } catch (e) {
@@ -45,9 +46,14 @@ class Database {
   }
 
   static Stream<Conversation> streamConversation(String cid) {
-    return _db.collection('conversations').doc(cid).snapshots().map(
-        (DocumentSnapshot<Map<String, dynamic>> doc) =>
-            Conversation.fromFireStore(doc));
+    return _db
+        .collection('conversations')
+        .doc(cid)
+        .snapshots()
+        .map(
+          (DocumentSnapshot<Map<String, dynamic>> doc) =>
+              Conversation.fromFireStore(doc),
+        );
   }
 
   static Stream<List<Conversation>> streamConversations(String uid) {
@@ -56,10 +62,15 @@ class Database {
         .orderBy('lastMessage.timestamp', descending: true)
         .where('users', arrayContains: uid)
         .snapshots()
-        .map((QuerySnapshot<Map<String, dynamic>> list) => list.docs
-            .map((DocumentSnapshot<Map<String, dynamic>> doc) =>
-                Conversation.fromFireStore(doc))
-            .toList());
+        .map(
+          (QuerySnapshot<Map<String, dynamic>> list) =>
+              list.docs
+                  .map(
+                    (DocumentSnapshot<Map<String, dynamic>> doc) =>
+                        Conversation.fromFireStore(doc),
+                  )
+                  .toList(),
+        );
   }
 
   static Stream<List<Message>> streamConversationMessages(
@@ -73,15 +84,21 @@ class Database {
         .orderBy('timestamp', descending: true)
         .limit(20)
         .snapshots()
-        .map((QuerySnapshot<Map<String, dynamic>> list) => list.docs
-            .map((DocumentSnapshot<Map<String, dynamic>> doc) =>
-                Message.fromFireStore(doc))
-            .toList());
+        .map(
+          (QuerySnapshot<Map<String, dynamic>> list) =>
+              list.docs
+                  .map(
+                    (DocumentSnapshot<Map<String, dynamic>> doc) =>
+                        Message.fromFireStore(doc),
+                  )
+                  .toList(),
+        );
   }
 
   static void updateMessageRead(Conversation conversation) {
-    final DocumentReference documentReference =
-        _db.collection('conversations').doc(conversation.idConversation);
+    final DocumentReference documentReference = _db
+        .collection('conversations')
+        .doc(conversation.idConversation);
 
     documentReference.update({
       'lastMessage': {
@@ -96,8 +113,9 @@ class Database {
   }
 
   static void acceptConversationRequest(Conversation conversation) {
-    final DocumentReference documentReference =
-        _db.collection('conversations').doc(conversation.idConversation);
+    final DocumentReference documentReference = _db
+        .collection('conversations')
+        .doc(conversation.idConversation);
 
     documentReference.update({
       "accepted": true,
@@ -112,53 +130,64 @@ class Database {
     String content,
     Timestamp timestamp,
   ) {
-    final DocumentReference conversationDoc =
-        _db.collection('conversations').doc(idConversation);
+    final DocumentReference conversationDoc = _db
+        .collection('conversations')
+        .doc(idConversation);
 
-    conversationDoc.update(<String, dynamic>{
-      'lastMessage': <String, dynamic>{
-        'idMessage':
-            "${idFrom + "_" + timestamp.millisecondsSinceEpoch.toString()}",
-        'idFrom': idFrom,
-        'idTo': idTo,
-        'timestamp': timestamp,
-        'content': content,
-        'read': false
-      },
-    }).then((dynamic success) {
-      final DocumentReference messageDoc = _db
-          .collection('conversations')
-          .doc(idConversation)
-          .collection('messages')
-          .doc("${idFrom + "_" + timestamp.millisecondsSinceEpoch.toString()}");
-
-      _db.runTransaction((Transaction transaction) async {
-        await transaction.set(
-          messageDoc,
-          <String, dynamic>{
-            'content': content,
-            'idFrom': idFrom,
+    conversationDoc
+        .update(<String, dynamic>{
+          'lastMessage': <String, dynamic>{
             'idMessage':
                 "${idFrom + "_" + timestamp.millisecondsSinceEpoch.toString()}",
+            'idFrom': idFrom,
             'idTo': idTo,
-            'read': false,
             'timestamp': timestamp,
+            'content': content,
+            'read': false,
           },
-        );
-      });
-    });
+        })
+        .then((dynamic success) {
+          final DocumentReference messageDoc = _db
+              .collection('conversations')
+              .doc(idConversation)
+              .collection('messages')
+              .doc(
+                "${idFrom + "_" + timestamp.millisecondsSinceEpoch.toString()}",
+              );
+
+          _db.runTransaction((Transaction transaction) async {
+            await transaction.set(messageDoc, <String, dynamic>{
+              'content': content,
+              'idFrom': idFrom,
+              'idMessage':
+                  "${idFrom + "_" + timestamp.millisecondsSinceEpoch.toString()}",
+              'idTo': idTo,
+              'read': false,
+              'timestamp': timestamp,
+            });
+          });
+        });
   }
 
   // User
   static Future<AppUser> getAppUser(String uid) async {
-    AppUser dummyUser =
-        AppUser("", "", "", "", "", "", Timestamp.now(), [], [], [], []);
+    AppUser dummyUser = AppUser(
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      Timestamp.now(),
+      [],
+      [],
+      [],
+      [],
+    );
     try {
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .get()
-          .then((DocumentSnapshot<Map<String, dynamic>> userSnapshot) {
+      await FirebaseFirestore.instance.collection('users').doc(uid).get().then((
+        DocumentSnapshot<Map<String, dynamic>> userSnapshot,
+      ) {
         AppUser requestedUser = AppUser.fromSnapshot(userSnapshot);
         return dummyUser = requestedUser;
       });
@@ -174,15 +203,24 @@ class Database {
   static Stream<List<AppUser>> getAppUsersByList(List<String> userIds) {
     final List<Stream<AppUser>> streams = [];
     for (String id in userIds) {
-      streams.add(_db.collection('users').doc(id).snapshots().map(
-          (DocumentSnapshot<Map<String, dynamic>> snap) =>
-              AppUser.fromMap(snap.data()!)));
+      streams.add(
+        _db
+            .collection('users')
+            .doc(id)
+            .snapshots()
+            .map(
+              (DocumentSnapshot<Map<String, dynamic>> snap) =>
+                  AppUser.fromMap(snap.data()!),
+            ),
+      );
     }
     return StreamZip<AppUser>(streams).asBroadcastStream();
   }
 
-  static Future<Image> getProfileImage(String uid,
-      {String? profilePictureId}) async {
+  static Future<Image> getProfileImage(
+    String uid, {
+    String? profilePictureId,
+  }) async {
     Image image = Image.asset(
       "assets/images/default_profile_picture.png",
       height: 40.0,
@@ -211,8 +249,9 @@ class Database {
           }
         }
         //Picture was not found. Download it and delete older pictures
-        final File newUserProfileImage =
-            File('${extStorageDir.path}/users/$uid/$profilePictureId.jpg');
+        final File newUserProfileImage = File(
+          '${extStorageDir.path}/users/$uid/$profilePictureId.jpg',
+        );
         try {
           final Reference userProfileImageRef = FirebaseStorage.instance
               .ref()
@@ -261,8 +300,9 @@ class Database {
       if (profilePictureId == null) {
         profilePictureId = "${uid}_0";
       }
-      final File newUserProfileImage =
-          File('${extStorageDir.path}/users/$uid/$profilePictureId.jpg');
+      final File newUserProfileImage = File(
+        '${extStorageDir.path}/users/$uid/$profilePictureId.jpg',
+      );
       try {
         final Reference userProfileImageRef = FirebaseStorage.instance
             .ref()
@@ -287,8 +327,11 @@ class Database {
   static Future<List<Map<String, dynamic>>> getStoryImages(String uid) async {
     List<Map<String, dynamic>> files = [];
 
-    final Reference userStoryRef =
-        FirebaseStorage.instance.ref().child('users').child(uid).child('story');
+    final Reference userStoryRef = FirebaseStorage.instance
+        .ref()
+        .child('users')
+        .child(uid)
+        .child('story');
     final results = await userStoryRef.listAll();
 
     await Future.forEach<Reference>(results.items, (file) async {
@@ -300,7 +343,7 @@ class Database {
         "name": file.name,
         "uploaded_by": fileMeta.customMetadata?['uploaded_by'] ?? 'Nobody',
         "description":
-            fileMeta.customMetadata?['description'] ?? 'No description'
+            fileMeta.customMetadata?['description'] ?? 'No description',
       });
       files.sort((b, a) => a['name'].compareTo(b['name']));
     });

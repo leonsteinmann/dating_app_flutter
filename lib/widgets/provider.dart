@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:datingapp/models/user.dart';
-import 'package:datingapp/services/database.dart';
+import 'package:dating_app_flutter/models/user.dart';
+import 'package:dating_app_flutter/services/database.dart';
 import 'package:flutter/material.dart';
 
 class LocationModeSelector with ChangeNotifier {
@@ -25,8 +25,19 @@ class LocationModeSelector with ChangeNotifier {
 }
 
 class CurrUser with ChangeNotifier {
-  AppUser? currUser =
-      AppUser("", "", "", "", "", "", Timestamp.now(), [], [], [], []);
+  AppUser? currUser = AppUser(
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    Timestamp.now(),
+    [],
+    [],
+    [],
+    [],
+  );
 
   void updateCurrentUser(uid) async {
     currUser = await Database.getAppUser(uid);

@@ -1,4 +1,4 @@
-import 'package:datingapp/pages/login.dart';
+import 'package:dating_app_flutter/pages/login.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,12 +24,20 @@ void main() async {
     badge: true,
     sound: true,
   );
-  runApp(MultiProvider(providers: [
-    ChangeNotifierProvider<LocationModeSelector>(
-        create: (context) => LocationModeSelector()),
-    ChangeNotifierProvider<CurrUser>(create: (context) => CurrUser()),
-    ChangeNotifierProvider<ThemeNotifier>(create: (_) => new ThemeNotifier()),
-  ], child: MyApp()));
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<LocationModeSelector>(
+          create: (context) => LocationModeSelector(),
+        ),
+        ChangeNotifierProvider<CurrUser>(create: (context) => CurrUser()),
+        ChangeNotifierProvider<ThemeNotifier>(
+          create: (_) => new ThemeNotifier(),
+        ),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 void callbackDispatcher() {
@@ -67,24 +75,23 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeNotifier>(
-        builder: (context, theme, _) => MaterialApp(
-              theme: theme.getTheme(),
-              localizationsDelegates: [
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
-              supportedLocales: [
-                const Locale('de', ''),
-                const Locale('en', ''),
-              ],
-              routes: {
-                // When navigating to the "/" route, build the FirstScreen widget.
-                '/': (context) => NavigatorPage(),
-                // When navigating to the "/second" route, build the SecondScreen widget.
-                '/conversations': (context) => ConversationsPage(),
-              }, //home: RootPage(),
-            ));
+      builder:
+          (context, theme, _) => MaterialApp(
+            theme: theme.getTheme(),
+            localizationsDelegates: [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: [const Locale('de', ''), const Locale('en', '')],
+            routes: {
+              // When navigating to the "/" route, build the FirstScreen widget.
+              '/': (context) => NavigatorPage(),
+              // When navigating to the "/second" route, build the SecondScreen widget.
+              '/conversations': (context) => ConversationsPage(),
+            }, //home: RootPage(),
+          ),
+    );
   }
 }
 
@@ -92,9 +99,10 @@ class NavigatorPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: (FirebaseAuth.instance.currentUser == null)
-          ? LoginPage()
-          : RootPage(selectedView: 1),
+      body:
+          (FirebaseAuth.instance.currentUser == null)
+              ? LoginPage()
+              : RootPage(selectedView: 1),
     );
   }
 }
